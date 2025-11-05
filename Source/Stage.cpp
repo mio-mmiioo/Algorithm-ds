@@ -4,21 +4,15 @@
 namespace {
 	float BOX_WIDTH = 30;
 	float BOX_HEIGHT = 30;
-	enum DIR {
-		RIGHT,
-		DOWN,
-		LEFT,
-		UP,
-		MAX_DIR
-	};
+
 }
 
 Stage::Stage()
 {
-	dir[RIGHT] = {  1,  0 };
-	dir[DOWN]  = {  0,  1 };
-	dir[LEFT]  = { -1,  0 };
-	dir[UP]    = {  0, -1 };
+	dir_[RIGHT] = {  1,  0 };
+	dir_[DOWN]  = {  0,  1 };
+	dir_[LEFT]  = { -1,  0 };
+	dir_[UP]    = {  0, -1 };
 
 	char filename[64];
 	sprintf_s<64>(filename, "data/stage%02d.csv", 1);
@@ -163,8 +157,8 @@ bool Stage::CheckDir(int mapX, int mapY)
 	
 	for (int i = 0; i < DIR::MAX_DIR; i++)
 	{
-		int x = mapX + dir[i].x;
-		int y = mapY + dir[i].y;
+		int x = mapX + dir_[i].x;
+		int y = mapY + dir_[i].y;
 		if (map_[y][x] == 0 || map_[y][x] == 2)
 		{
 			checkDir[i] = true;
@@ -200,6 +194,20 @@ bool Stage::CheckDir(int mapX, int mapY)
 		}
 	}
 
+	// いらないかも
+	if (ret == true)
+	{
+		for (int i = 0; i < DIR::MAX_DIR; i++)
+		{
+			if (checkDir[i] == true)
+			{
+				VECTOR2 v = { (float)mapX, (float)mapY };
+				vertex_.push_back(v);
+
+			}
+		}
+	}
+
 	return ret;
 }
 
@@ -211,9 +219,7 @@ void Stage::CreateGoPos(float x, float y)
 	map_[mapY][mapX] = 3;
 }
 
-void Stage::SetVertexDistance()
+void Stage::SetVertexDistance(int x, int y, DIR dir)
 {
-	// リスト的なものを作成
 
-	// 距離を測り、記録
 }

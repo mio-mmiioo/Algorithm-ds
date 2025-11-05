@@ -1,7 +1,7 @@
 #pragma once
 #include "../Library/Object2D.h"
 #include <vector>
-
+#include <list>
 class Stage : public Object2D
 {
 public:
@@ -18,15 +18,24 @@ public:
 	VECTOR2 GetGoPos() { return goPos_; }
 
 private:
+	enum DIR {
+		RIGHT,
+		DOWN,
+		LEFT,
+		UP,
+		MAX_DIR
+	};
+
 	bool IsWall(VECTOR2 pos);
 	bool CheckDir(int mapX, int mapY);
 	void CreateGoPos(float x, float y);
-	void SetVertexDistance();
+	void SetVertexDistance(int x, int y, DIR dir);
 	
-	VECTOR2 dir[4];
+	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
 
 	// 経路探索関連
 	VECTOR2 goPos_;
-	std::vector<std::vector<int>> vertex_; // 割り当てられた頂点番号, 距離
+	std::list<VECTOR2> vertex_; // 頂点
+	std::vector<std::vector<int>> vertexDistance_; // 割り当てられた頂点番号, 距離
 };
