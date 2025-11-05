@@ -2,6 +2,7 @@
 #include "../Library/Object2D.h"
 #include <vector>
 #include <list>
+
 class Stage : public Object2D
 {
 public:
@@ -29,13 +30,13 @@ private:
 	bool IsWall(VECTOR2 pos);
 	bool CheckDir(int mapX, int mapY);
 	void CreateGoPos(float x, float y);
-	void SetVertexDistance(int x, int y, DIR dir);
+	void SetVertexDistance(int num, int x, int y, int dir); // 番号、x座標、y座標、方向
 	
 	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
 
 	// 経路探索関連
 	VECTOR2 goPos_;
-	std::list<VECTOR2> vertex_; // 頂点
-	std::vector<std::vector<int>> vertexDistance_; // 割り当てられた頂点番号, 距離
+	std::vector<VECTOR2> vertex_; // <頂点, 向き>
+	std::vector<std::pair<VECTOR2, int>> vertexDistance_; // 割り当てられた頂点番号, 距離
 };

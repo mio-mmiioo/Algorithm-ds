@@ -14,6 +14,8 @@ Stage::Stage()
 	dir_[LEFT]  = { -1,  0 };
 	dir_[UP]    = {  0, -1 };
 
+	vertexDistance_.resize(100); // ‚±‚Ì‚­‚ç‚¢‚ ‚ê‚Î‘«‚è‚é‚Í‚¸
+
 	char filename[64];
 	sprintf_s<64>(filename, "data/stage%02d.csv", 1);
 	map_.clear();
@@ -44,6 +46,8 @@ Stage::Stage()
 			}
 		}
 	}
+
+	
 }
 
 Stage::~Stage()
@@ -203,10 +207,12 @@ bool Stage::CheckDir(int mapX, int mapY)
 			{
 				VECTOR2 v = { (float)mapX, (float)mapY };
 				vertex_.push_back(v);
-
+				SetVertexDistance(vertex_.size() - 1, mapX, mapY, checkDir[i]);
 			}
 		}
 	}
+
+	
 
 	return ret;
 }
@@ -219,7 +225,19 @@ void Stage::CreateGoPos(float x, float y)
 	map_[mapY][mapX] = 3;
 }
 
-void Stage::SetVertexDistance(int x, int y, DIR dir)
+void Stage::SetVertexDistance(int num, int x, int y, int dir)
 {
+	// ‹——£‚ğ‹‚ß‚é®
+	int distance = 0;
+	int checkX = x;
+	int checkY = y;
+	VECTOR2 check = { y, x };
 
+	//while (map_[checkY][checkX] != 3)
+	//{
+
+	//}
+
+	// <’¸“_‚Ì”Ô†, ‹——£>‚ğvertexDistance‚É‘ã“ü‚·‚é
+	vertexDistance_[num] = std::make_pair(VECTOR2(x, y), distance);
 }
