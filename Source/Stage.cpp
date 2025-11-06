@@ -1,5 +1,9 @@
 #include "Stage.h"
 #include "../Library/CsvReader.h"
+#include <vector>
+#include <queue>
+
+using cr_pair = std::pair<int, vInfo1>;
 
 namespace {
 	float BOX_WIDTH = 30;
@@ -30,6 +34,8 @@ Stage::Stage()
 	}
 	delete csv;
 	
+	start_ = { 1,1 }; // マジックナンバー、消すこと
+	vertexCount_ = 0;
 	SetVertexDistance();
 	
 }
@@ -66,6 +72,7 @@ void Stage::Draw()
 		}
 	}
 
+	// 情報を表示
 	for (int i = 0; i < vertexDistance_.size(); i++)
 	{
 		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%02f, %02f), distance:%d",
@@ -116,6 +123,13 @@ int Stage::CheckUp(VECTOR2 pos)
 	int y = pos.y / BOX_HEIGHT;
 	int dy = pos.y - y * BOX_HEIGHT; // チップの中の座標
 	return BOX_HEIGHT - dy;
+}
+
+void Stage::SetStartVertex(VECTOR2 pos)
+{
+	int x = pos.x / BOX_WIDTH;
+	int y = pos.y / BOX_HEIGHT;
+	start_ = { x, y };
 }
 
 bool Stage::IsWall(VECTOR2 pos)
@@ -233,6 +247,7 @@ void Stage::SetVertexDistance()
 
 void Stage::CheckDir(int x, int y)
 {
+	vertexCount_ += 1;
 	for (int i = 0; i < DIR::MAX_DIR; i++)
 	{
 		VECTOR2 check = { x, y };
@@ -248,7 +263,31 @@ void Stage::CheckDir(int x, int y)
 				distance += 1;
 			}
 			vInfo current = { x, y, dir_[i] }; // x座標、y座標、方向
+			vInfo1 c = { x, y };
 			vertexDistance_.push_back(std::make_pair(current, distance));
+			vertexDistance1_.push_back(std::make_pair(c, distance));
 		}
 	}
 }
+
+void Stage::DecisionShortestWay()
+{
+	std::vector<std::vector<int>> dist;
+	// 大きい値で初期化
+	for (int i = 0; i < vertexDistance_.size(); i++)
+	{
+		for (int j = 0; j < vertexDistance_.size(); j++)
+		{
+			dist[i][j] = 1000;
+		}
+	}
+
+	dist[start_.x_][start_.y_] = 0; // マジックナンバー // スタート地点は0にする
+
+	std::priority_queue<cr_pair, std::vector<cr_pair>, std::greater<cr_pair>> que; // この書き方をすると昇順のキューになる
+
+	que.push({0, start_});// 最初の現在地はスタート地点。{0: スタート地点から現在地までの距離, start_: 現在地のindex}
+
+}
+
+
