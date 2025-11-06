@@ -5,7 +5,6 @@ struct VECTOR2 {
 	float x, y;
 	VECTOR2() { x = 0; y = 0; }
 	VECTOR2(float _x, float _y) { x = _x; y = _y; }
-	VECTOR2(int _x, int _y) { x = _x; y = _y; }
 };
 inline VECTOR2 operator -(VECTOR2 a, VECTOR2 b) {
 	VECTOR2 r;

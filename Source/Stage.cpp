@@ -57,18 +57,18 @@ void Stage::Draw()
 		{
 			if (map_[y][x] == 1)
 			{
-				DrawBox(x * BOX_WIDTH, y * BOX_HEIGHT, x * BOX_WIDTH + BOX_WIDTH, y * BOX_HEIGHT + BOX_HEIGHT, GetColor(255, 255, 255), TRUE);
+				DrawBox(x * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, x * (int)BOX_WIDTH + (int)BOX_WIDTH, y * (int)BOX_HEIGHT + (int)BOX_HEIGHT, GetColor(255, 255, 255), TRUE);
 			}
 			if (map_[y][x] == 2)
 			{
-				DrawBox(x * BOX_WIDTH, y * BOX_HEIGHT, x * BOX_WIDTH + BOX_WIDTH, y * BOX_HEIGHT + BOX_HEIGHT, GetColor(100, 200, 100), TRUE);
+				DrawBox(x * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, x * (int)BOX_WIDTH + (int)BOX_WIDTH, y * (int)BOX_HEIGHT + (int)BOX_HEIGHT, GetColor(100, 200, 100), TRUE);
 			}
 			if (map_[y][x] == 3)
 			{
-				DrawBox(x * BOX_WIDTH, y * BOX_HEIGHT, x * BOX_WIDTH + BOX_WIDTH, y * BOX_HEIGHT + BOX_HEIGHT, GetColor(100, 100, 200), TRUE);
+				DrawBox(x * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, x * (int)BOX_WIDTH + (int)BOX_WIDTH, y * (int)BOX_HEIGHT + (int)BOX_HEIGHT, GetColor(100, 100, 200), TRUE);
 			}
-			DrawLine(x * BOX_WIDTH, 0, x * BOX_WIDTH, map_.size() * BOX_HEIGHT, GetColor(0, 0, 0)); // 縦
-			DrawLine(0, y * BOX_HEIGHT, map_[0].size() * BOX_WIDTH, y * BOX_HEIGHT, GetColor(0, 0, 0)); // 横
+			DrawLine(x * (int)BOX_WIDTH, 0, x * (int)BOX_WIDTH, (int)map_.size() * (int)BOX_HEIGHT, GetColor(0, 0, 0)); // 縦
+			DrawLine(0, y * (int)BOX_HEIGHT, (int)map_[0].size() * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, GetColor(0, 0, 0)); // 横
 		}
 	}
 
@@ -87,8 +87,8 @@ int Stage::CheckRight(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int x = pos.x / BOX_WIDTH;
-	int dx = pos.x - x * BOX_WIDTH; // チップの中の座標
+	int x = (int)pos.x / (int)BOX_WIDTH;
+	int dx = (int)pos.x - x * (int)BOX_WIDTH; // チップの中の座標
 	return dx + 1;
 }
 
@@ -98,9 +98,9 @@ int Stage::CheckLeft(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int x = pos.x / BOX_WIDTH;
-	int dx = pos.x - x * BOX_WIDTH; // チップの中の座標
-	return BOX_WIDTH - dx;
+	int x = (int)pos.x / (int)BOX_WIDTH;
+	int dx = (int)pos.x - x * (int)BOX_WIDTH; // チップの中の座標
+	return (int)BOX_WIDTH - dx;
 }
 
 int Stage::CheckDown(VECTOR2 pos)
@@ -109,8 +109,8 @@ int Stage::CheckDown(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int y = pos.y / BOX_HEIGHT;
-	int dy = pos.y - y * BOX_HEIGHT; // チップの中の座標
+	int y = (int)pos.y / (int)BOX_HEIGHT;
+	int dy = (int)pos.y - y * (int)BOX_HEIGHT; // チップの中の座標
 	return dy + 1;
 }
 
@@ -120,23 +120,23 @@ int Stage::CheckUp(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int y = pos.y / BOX_HEIGHT;
-	int dy = pos.y - y * BOX_HEIGHT; // チップの中の座標
-	return BOX_HEIGHT - dy;
+	int y = (int)pos.y / (int)BOX_HEIGHT;
+	int dy = (int)pos.y - y * (int)BOX_HEIGHT; // チップの中の座標
+	return (int)BOX_HEIGHT - dy;
 }
 
 void Stage::SetStartVertex(VECTOR2 pos)
 {
-	int x = pos.x / BOX_WIDTH;
-	int y = pos.y / BOX_HEIGHT;
+	int x = (int)pos.x / (int)BOX_WIDTH;
+	int y = (int)pos.y / (int)BOX_HEIGHT;
 	start_ = { x, y };
 }
 
 bool Stage::IsWall(VECTOR2 pos)
 {
 	// チップの場所を特定する
-	int x = pos.x / BOX_WIDTH;
-	int y = pos.y / BOX_HEIGHT;
+	int x = (int)pos.x / (int)BOX_WIDTH;
+	int y = (int)pos.y / (int)BOX_HEIGHT;
 	if (y < 0 || y >= map_.size()) {
 		return false;
 	}
@@ -166,8 +166,8 @@ bool Stage::SetVertex(int mapX, int mapY)
 	
 	for (int i = 0; i < DIR::MAX_DIR; i++)
 	{
-		int x = mapX + dir_[i].x;
-		int y = mapY + dir_[i].y;
+		int x = mapX + (int)dir_[i].x;
+		int y = mapY + (int)dir_[i].y;
 		if (map_[y][x] == 0 || map_[y][x] == 2)
 		{
 			checkDir[i] = true;
@@ -209,8 +209,8 @@ bool Stage::SetVertex(int mapX, int mapY)
 void Stage::CreateGoPos(float x, float y)
 {
 	goPos_ = { x, y };
-	int mapX = x / BOX_WIDTH;
-	int mapY = y / BOX_HEIGHT;
+	int mapX = (int)x / (int)BOX_WIDTH;
+	int mapY = (int)y / (int)BOX_HEIGHT;
 	map_[mapY][mapX] = 3;
 }
 
@@ -250,14 +250,14 @@ void Stage::CheckDir(int x, int y)
 	vertexCount_ += 1;
 	for (int i = 0; i < DIR::MAX_DIR; i++)
 	{
-		VECTOR2 check = { x, y };
+		VECTOR2 check = { (float)x, (float)y };
 		check = check + dir_[i];
 
 		int distance = 1;
 		// 距離を求める式
-		if (map_[check.y][check.x] != 1) // 壁じゃないなら
+		if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
 		{
-			while (map_[check.y][check.x] != 2) // 頂点に到達していない場合くり返す
+			while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
 			{
 				check = check + dir_[i];
 				distance += 1;
@@ -272,22 +272,47 @@ void Stage::CheckDir(int x, int y)
 
 void Stage::DecisionShortestWay()
 {
-	std::vector<std::vector<int>> dist;
+	dist.clear();
 	// 大きい値で初期化
-	for (int i = 0; i < vertexDistance_.size(); i++)
+	for (int i = 0; i < vertexDistance1_.size(); i++)
 	{
-		for (int j = 0; j < vertexDistance_.size(); j++)
-		{
-			dist[i][j] = 1000;
-		}
+		dist[i] = 1000;
 	}
 
-	dist[start_.x_][start_.y_] = 0; // マジックナンバー // スタート地点は0にする
+	//if (std::find_if(vertexDistance1_.begin(), vertexDistance1_.end(), FindStartVertex()) == vertexDistance1_.end())
+	//{
+	//	 成功
+	//}
+	//else
+	//{
+	//	return; // 失敗
+	//}
 
-	std::priority_queue<cr_pair, std::vector<cr_pair>, std::greater<cr_pair>> que; // この書き方をすると昇順のキューになる
+	//for (int i = 0; i < DIR::MAX_DIR; i++)
+	//{
 
-	que.push({0, start_});// 最初の現在地はスタート地点。{0: スタート地点から現在地までの距離, start_: 現在地のindex}
+	//}
 
+	//std::priority_queue<cr_pair, std::vector<cr_pair>, std::greater<cr_pair>> que; // この書き方をすると昇順のキューになる
+
+	//que.push({0, start_});// 最初の現在地はスタート地点。{0: スタート地点から現在地までの距離, start_: 現在地のindex}
+
+}
+
+bool Stage::FindStartVertex()
+{
+	for (int i = 0; i < vertexDistance1_.size(); i++)
+	{
+		if (start_.x_ == vertexDistance1_[i].first.x_)
+		{
+			if (start_.y_ == vertexDistance1_[i].first.y_)
+			{
+				dist[i] = 0;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 

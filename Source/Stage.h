@@ -46,6 +46,8 @@ private:
 
 	void DecisionShortestWay();
 
+	bool FindStartVertex();
+
 	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
 
@@ -56,5 +58,6 @@ private:
 	std::vector<std::pair<vInfo1, int>> vertexDistance1_; // 割り当てられた頂点番号, 距離 こっちで最終的にはかく
 
 	int vertexCount_;
+	std::vector<int> dist;
 	vInfo1 start_; // スタートポジション
 };
