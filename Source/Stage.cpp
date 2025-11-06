@@ -34,7 +34,7 @@ Stage::Stage()
 	}
 	delete csv;
 	
-	start_ = { 1,1 }; // マジックナンバー、消すこと
+	start_ = { 5,1 }; // マジックナンバー、消すこと
 	vertexCount_ = 0;
 	SetVertexDistance();
 	
@@ -47,6 +47,11 @@ Stage::~Stage()
 void Stage::Update()
 {
 	CreateGoPos(10 * BOX_WIDTH - BOX_WIDTH / 2, 1 * BOX_HEIGHT + BOX_HEIGHT / 2);
+
+	if (CheckHitKey(KEY_INPUT_C))
+	{
+		DecisionShortestWay();
+	}
 }
 
 void Stage::Draw()
@@ -273,43 +278,41 @@ void Stage::CheckDir(int x, int y)
 void Stage::DecisionShortestWay()
 {
 	dist.clear();
+	dist.resize(vertexCount_);
 	// 大きい値で初期化
-	for (int i = 0; i < vertexDistance1_.size(); i++)
+	for (int i = 0; i < vertexCount_; i++)
 	{
 		dist[i] = 1000;
 	}
 
-	//if (std::find_if(vertexDistance1_.begin(), vertexDistance1_.end(), FindStartVertex()) == vertexDistance1_.end())
-	//{
-	//	 成功
-	//}
-	//else
-	//{
-	//	return; // 失敗
-	//}
+	FindStartVertex();
 
-	//for (int i = 0; i < DIR::MAX_DIR; i++)
-	//{
 
-	//}
-
-	//std::priority_queue<cr_pair, std::vector<cr_pair>, std::greater<cr_pair>> que; // この書き方をすると昇順のキューになる
-
-	//que.push({0, start_});// 最初の現在地はスタート地点。{0: スタート地点から現在地までの距離, start_: 現在地のindex}
+	
 
 }
 
 bool Stage::FindStartVertex()
 {
+	int counter = 0;
+	int prevX = -1;
+	int prevY = -1;
 	for (int i = 0; i < vertexDistance1_.size(); i++)
 	{
 		if (start_.x_ == vertexDistance1_[i].first.x_)
 		{
 			if (start_.y_ == vertexDistance1_[i].first.y_)
 			{
-				dist[i] = 0;
+				dist[counter] = 0;
 				return true;
 			}
+		}
+		// 違う座標を確認する
+		if (!(prevX == vertexDistance1_[i].first.x_ && prevY == vertexDistance1_[i].first.y_))
+		{
+			prevX = vertexDistance1_[i].first.x_;
+			prevY = vertexDistance1_[i].first.y_;
+			counter += 1;
 		}
 	}
 	return false;
