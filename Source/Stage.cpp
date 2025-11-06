@@ -14,8 +14,6 @@ Stage::Stage()
 	dir_[LEFT]  = { -1,  0 };
 	dir_[UP]    = {  0, -1 };
 
-	vertexDistance_.resize(100); // このくらいあれば足りるはず
-
 	char filename[64];
 	sprintf_s<64>(filename, "data/stage%02d.csv", 1);
 	map_.clear();
@@ -32,21 +30,7 @@ Stage::Stage()
 	}
 	delete csv;
 	
-	for (int y = 0; y < map_.size(); y++)
-	{
-		for (int x = 0; x < map_[0].size(); x++)
-		{
-			if (map_[y][x] == 0)
-			{
-				if (CheckDir(x, y) == true) // 一方通行じゃない→分岐地点
-				{
-					map_[y][x] = 2;
-				}
-
-			}
-		}
-	}
-
+	SetVertexDistance();
 	
 }
 
@@ -80,6 +64,13 @@ void Stage::Draw()
 			DrawLine(x * BOX_WIDTH, 0, x * BOX_WIDTH, map_.size() * BOX_HEIGHT, GetColor(0, 0, 0)); // 縦
 			DrawLine(0, y * BOX_HEIGHT, map_[0].size() * BOX_WIDTH, y * BOX_HEIGHT, GetColor(0, 0, 0)); // 横
 		}
+	}
+
+	for (int i = 0; i < vertexDistance_.size(); i++)
+	{
+		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%02f, %02f), distance:%d",
+			vertexDistance_[i].first.x_, vertexDistance_[i].first.y_, 
+			vertexDistance_[i].first.direction_.x, vertexDistance_[i].first.direction_.y, vertexDistance_[i].second);
 	}
 }
 
@@ -148,7 +139,7 @@ bool Stage::IsWall(VECTOR2 pos)
 	return true;
 }
 
-bool Stage::CheckDir(int mapX, int mapY)
+bool Stage::SetVertex(int mapX, int mapY)
 {
 	int counter = 0;
 	bool ret = false;
@@ -198,22 +189,6 @@ bool Stage::CheckDir(int mapX, int mapY)
 		}
 	}
 
-	// いらないかも
-	if (ret == true)
-	{
-		for (int i = 0; i < DIR::MAX_DIR; i++)
-		{
-			if (checkDir[i] == true)
-			{
-				VECTOR2 v = { (float)mapX, (float)mapY };
-				vertex_.push_back(v);
-				SetVertexDistance(vertex_.size() - 1, mapX, mapY, checkDir[i]);
-			}
-		}
-	}
-
-	
-
 	return ret;
 }
 
@@ -225,19 +200,55 @@ void Stage::CreateGoPos(float x, float y)
 	map_[mapY][mapX] = 3;
 }
 
-void Stage::SetVertexDistance(int num, int x, int y, int dir)
+void Stage::SetVertexDistance()
 {
-	// 距離を求める式
-	int distance = 0;
-	int checkX = x;
-	int checkY = y;
-	VECTOR2 check = { y, x };
+	// 分岐点を頂点にする
+	for (int y = 0; y < map_.size(); y++)
+	{
+		for (int x = 0; x < map_[0].size(); x++)
+		{
+			if (map_[y][x] == 0)
+			{
+				if (SetVertex(x, y) == true) // 一方通行じゃない→分岐地点
+				{
+					map_[y][x] = 2;
+				}
 
-	//while (map_[checkY][checkX] != 3)
-	//{
+			}
+		}
+	}
 
-	//}
+	// 頂点と距離を求めて、代入する
+	for (int y = 0; y < map_.size(); y++)
+	{
+		for (int x = 0; x < map_[0].size(); x++)
+		{
+			if (map_[y][x] == 2)
+			{
+				CheckDir(x, y);
+			}
+		}
+	}
+}
 
-	// <頂点の番号, 距離>をvertexDistanceに代入する
-	vertexDistance_[num] = std::make_pair(VECTOR2(x, y), distance);
+void Stage::CheckDir(int x, int y)
+{
+	for (int i = 0; i < DIR::MAX_DIR; i++)
+	{
+		VECTOR2 check = { x, y };
+		check = check + dir_[i];
+
+		int distance = 1;
+		// 距離を求める式
+		if (map_[check.y][check.x] != 1) // 壁じゃないなら
+		{
+			while (map_[check.y][check.x] != 2) // 頂点に到達していない場合くり返す
+			{
+				check = check + dir_[i];
+				distance += 1;
+			}
+			vInfo current = { x, y, dir_[i] }; // x座標、y座標、方向
+			vertexDistance_.push_back(std::make_pair(current, distance));
+		}
+	}
 }

@@ -28,15 +28,21 @@ private:
 	};
 
 	bool IsWall(VECTOR2 pos);
-	bool CheckDir(int mapX, int mapY);
+	bool SetVertex(int mapX, int mapY);
 	void CreateGoPos(float x, float y);
-	void SetVertexDistance(int num, int x, int y, int dir); // 番号、x座標、y座標、方向
+	void SetVertexDistance();
+	void CheckDir(int x, int y);
 	
 	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
 
 	// 経路探索関連
 	VECTOR2 goPos_;
-	std::vector<VECTOR2> vertex_; // <頂点, 向き>
-	std::vector<std::pair<VECTOR2, int>> vertexDistance_; // 割り当てられた頂点番号, 距離
+	struct vInfo {
+		int x_;
+		int y_;
+		VECTOR2 direction_;
+	};
+	//std::vector<VECTOR2> vertex_; // <頂点, 向き>
+	std::vector<std::pair<vInfo, int>> vertexDistance_; // 割り当てられた頂点番号, 距離
 };
