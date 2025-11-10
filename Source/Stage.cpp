@@ -80,9 +80,9 @@ void Stage::Draw()
 	// 情報を表示
 	for (int i = 0; i < vertexDistance_.size(); i++)
 	{
-		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%02f, %02f), distance:%d",
+		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%2d, %2d), distance:%d",
 			vertexDistance_[i].first.x_, vertexDistance_[i].first.y_, 
-			vertexDistance_[i].first.direction_.x, vertexDistance_[i].first.direction_.y, vertexDistance_[i].second);
+			(int)vertexDistance_[i].first.direction_.x, (int)vertexDistance_[i].first.direction_.y, vertexDistance_[i].second);
 	}
 }
 
@@ -285,14 +285,17 @@ void Stage::DecisionShortestWay()
 		dist[i] = 1000;
 	}
 
-	FindStartVertex();
+	int x, y;
 
+	FindStartVertex(&x, &y);
+
+	// 壁じゃないほうに線を伸ばす
 
 	
 
 }
 
-bool Stage::FindStartVertex()
+bool Stage::FindStartVertex(int* x, int* y)
 {
 	int counter = 0;
 	int prevX = -1;
@@ -304,10 +307,12 @@ bool Stage::FindStartVertex()
 			if (start_.y_ == vertexDistance1_[i].first.y_)
 			{
 				dist[counter] = 0;
+				*x = vertexDistance1_[i].first.x_;
+				*y = vertexDistance1_[i].first.y_;
 				return true;
 			}
 		}
-		// 違う座標を確認する
+		// 違う座標か確認する
 		if (!(prevX == vertexDistance1_[i].first.x_ && prevY == vertexDistance1_[i].first.y_))
 		{
 			prevX = vertexDistance1_[i].first.x_;
@@ -316,6 +321,68 @@ bool Stage::FindStartVertex()
 		}
 	}
 	return false;
+}
+
+void Stage::DecisionWay()
+{
+	way_.clear();
+	way_.resize(vertexDistance_.size());
+	way_ = vertexDistance_;
+
+
+	dicisionVertex_.clear();
+	// 大きい値で初期化
+	for (int i = 0; i < vertexDistance_.size(); i++)
+	{
+		dicisionVertex_.push_back(std::make_pair())
+		way_[i].second = 1000;
+	}
+
+	// スタートポジションを見つける
+	for (int i = 0; i < way_.size(); i++)
+	{
+		if (start_.x_ == way_[i].first.x_)
+		{
+			if (start_.y_ == way_[i].first.y_)
+			{
+				way_[i].second = 0;
+				dicisionVertex_.push_back(std::make_pair(way_[i].first, 0));
+				break;
+			}
+		}
+	}
+
+	// ルートはいったん置いておく
+
+	// よくない書き方だけど、ごり押しでとりあえず書く
+
+	// 確認してる頂点を求める
+
+	// 壁じゃない方向に線を伸ばし、次の頂点の位置を求め、距離を求める
+
+	// 頂点情報の距離が現在の距離より大きかったら入れ替える
+
+	int x = dicisionVertex_[i].first.x_;
+	int y = dicisionVertex_[i].first.y_;
+	for (int i = 0; i < DIR::MAX_DIR; i++)
+	{
+		VECTOR2 check = { (float)x, (float)y };
+		check = check + dir_[i];
+
+		int distance = 1;
+		// 距離を求める式
+		if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
+		{
+			while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
+			{
+				check = check + dir_[i];
+				distance += 1;
+			}
+			vInfo current = { x, y, dir_[i] }; // x座標、y座標、方向
+			dicisionVertex_.push_back(std::make_pair(current, 0));
+		}
+	}
+
 }
 
 
