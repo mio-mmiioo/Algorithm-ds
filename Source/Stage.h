@@ -9,16 +9,10 @@ struct vertex {
 };
 
 struct way {
-	VECTOR2 startPos;
-	VECTOR2 endPos;
-	int cost;
+	VECTOR2 startPos = {0, 0};
+	VECTOR2 endPos = {0, 0};
+	int cost = 0;
 };
-//
-//struct way {
-//	vertex start;
-//	vertex end;
-//	int cost;
-//};
 
 class Stage : public Object2D
 {
@@ -52,6 +46,7 @@ private:
 	bool CheckVertex(int mapX, int mapY);
 
 	void FindStartVertex();
+	int GetCost(VECTOR2 startPos, VECTOR2 endPos);
 
 	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
@@ -61,5 +56,6 @@ private:
 	VECTOR2 start_;
 
 	std::vector<vertex> vertexList_;
+	std::vector<std::vector<VECTOR2>> wayList2_;
 	std::vector<way> wayList_;
 };

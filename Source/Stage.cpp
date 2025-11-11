@@ -33,7 +33,6 @@ Stage::Stage()
 	delete csv;
 	
 	start_ = { 5,1 }; // マジックナンバー、消すこと
-	//SetVertexDistance();
 	SetVertexList();
 }
 
@@ -50,6 +49,11 @@ void Stage::Update()
 		FindStartVertex();
 	}
 
+	if (CheckHitKey(KEY_INPUT_D))
+	{
+		int cost = 0;
+		cost = GetCost(vertexList_[0].position, vertexList_[1].position);
+	}
 }
 
 void Stage::Draw()
@@ -92,12 +96,14 @@ void Stage::Draw()
 	}
 
 	// 道情報の表示
-	for (int i = 0; i < wayList_.size(); i++)
 	{
-		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
-			(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
-			(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
-			wayList_[i].cost);
+		for (int i = 0; i < wayList_.size(); i++)
+		{
+			DrawFormatString(500, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+				(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+				(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+				wayList_[i].cost);
+		}
 	}
 }
 
@@ -298,5 +304,21 @@ void Stage::FindStartVertex()
 			break;
 		}
 	}
+}
+
+int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
+{
+	way ret;
+	for (int i = 0; i < wayList_.size(); i++)
+	{
+		if (wayList_[i].startPos.x == startPos.x && wayList_[i].startPos.y == startPos.y)
+		{
+			if (wayList_[i].endPos.y == endPos.y && wayList_[i].endPos.y == endPos.y)
+			{
+				ret = wayList_[i];
+			}
+		}
+	}
+	return ret.cost;
 }
 
