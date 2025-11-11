@@ -8,6 +8,18 @@ struct vertex {
 	std::vector<vertex> next;
 };
 
+struct way {
+	VECTOR2 startPos;
+	VECTOR2 endPos;
+	int cost;
+};
+//
+//struct way {
+//	vertex start;
+//	vertex end;
+//	int cost;
+//};
+
 class Stage : public Object2D
 {
 public:
@@ -49,5 +61,5 @@ private:
 	VECTOR2 start_;
 
 	std::vector<vertex> vertexList_;
-
+	std::vector<way> wayList_;
 };

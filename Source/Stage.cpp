@@ -75,24 +75,29 @@ void Stage::Draw()
 		}
 	}
 
-	// 情報を表示
-	//for (int i = 0; i < vertexDistance_.size(); i++)
-	//{
-	//	DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%2d, %2d), distance:%d",
-	//		vertexDistance_[i].first.x_, vertexDistance_[i].first.y_, 
-	//		(int)vertexDistance_[i].first.direction_.x, (int)vertexDistance_[i].first.direction_.y, vertexDistance_[i].second);
-	//}
-	int counter = 0;
-	for (int i = 0; i < vertexList_.size(); i++)
+	// 頂点情報の表示
 	{
-		DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
-			(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
-		for (int j = 0; j < vertexList_[i].next.size(); j++)
-		{
-			counter += 1;
-			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
-				(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
-		}
+		//int counter = 0;
+		//for (int i = 0; i < vertexList_.size(); i++)
+		//{
+		//	DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
+		//		(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
+		//	for (int j = 0; j < vertexList_[i].next.size(); j++)
+		//	{
+		//		counter += 1;
+		//		DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
+		//			(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
+		//	}
+		//}
+	}
+
+	// 道情報の表示
+	for (int i = 0; i < wayList_.size(); i++)
+	{
+		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+			(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+			(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+			wayList_[i].cost);
 	}
 }
 
@@ -211,11 +216,13 @@ void Stage::SetVertexList()
 					check = check + dir_[direction];
 					distance += 1;
 				}
+
 				for (int j = 0; j < vertexList_.size(); j++)
 				{
 					if (vertexList_[j].position.x == check.x && vertexList_[j].position.y == check.y)
 					{
 						vertexList_[i].next.push_back(vertexList_[j]);
+						wayList_.push_back(way{ vertexList_[i].position, vertexList_[j].position, distance });
 						break;
 					}
 				}
@@ -279,6 +286,17 @@ bool Stage::CheckVertex(int mapX, int mapY)
 
 void Stage::FindStartVertex()
 {
-
+	int x;
+	int y;
+	x = start_.x / BOX_WIDTH;
+	y = start_.y / BOX_HEIGHT;
+	for (int i = 0; i < vertexList_.size(); i++)
+	{
+		if ((float)x == vertexList_[i].position.x && (float)y == vertexList_[i].position.y)
+		{
+			vertexList_[i].distance = 0;
+			break;
+		}
+	}
 }
 
