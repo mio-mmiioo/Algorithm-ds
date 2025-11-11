@@ -35,9 +35,8 @@ Stage::Stage()
 	delete csv;
 	
 	start_ = { 5,1 }; // マジックナンバー、消すこと
-	vertexCount_ = 0;
 	SetVertexDistance();
-	
+	SetVertexList();
 }
 
 Stage::~Stage()
@@ -48,10 +47,6 @@ void Stage::Update()
 {
 	CreateGoPos(10 * BOX_WIDTH - BOX_WIDTH / 2, 1 * BOX_HEIGHT + BOX_HEIGHT / 2);
 
-	if (CheckHitKey(KEY_INPUT_C))
-	{
-		DecisionShortestWay();
-	}
 }
 
 void Stage::Draw()
@@ -78,11 +73,23 @@ void Stage::Draw()
 	}
 
 	// 情報を表示
-	for (int i = 0; i < vertexDistance_.size(); i++)
+	//for (int i = 0; i < vertexDistance_.size(); i++)
+	//{
+	//	DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%2d, %2d), distance:%d",
+	//		vertexDistance_[i].first.x_, vertexDistance_[i].first.y_, 
+	//		(int)vertexDistance_[i].first.direction_.x, (int)vertexDistance_[i].first.direction_.y, vertexDistance_[i].second);
+	//}
+	int counter = 0;
+	for (int i = 0; i < vertexList_.size(); i++)
 	{
-		DrawFormatString(500, i * 30, GetColor(255, 255, 255), "x:%d, y:%d, 向き:(%2d, %2d), distance:%d",
-			vertexDistance_[i].first.x_, vertexDistance_[i].first.y_, 
-			(int)vertexDistance_[i].first.direction_.x, (int)vertexDistance_[i].first.direction_.y, vertexDistance_[i].second);
+		DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
+			(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
+		for (int j = 0; j < vertexList_[i].next.size(); j++)
+		{
+			counter += 1;
+			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
+				(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
+		}
 	}
 }
 
@@ -252,7 +259,6 @@ void Stage::SetVertexDistance()
 
 void Stage::CheckDir(int x, int y)
 {
-	vertexCount_ += 1;
 	for (int i = 0; i < DIR::MAX_DIR; i++)
 	{
 		VECTOR2 check = { (float)x, (float)y };
@@ -275,26 +281,6 @@ void Stage::CheckDir(int x, int y)
 	}
 }
 
-void Stage::DecisionShortestWay()
-{
-	dist.clear();
-	dist.resize(vertexCount_);
-	// 大きい値で初期化
-	for (int i = 0; i < vertexCount_; i++)
-	{
-		dist[i] = 1000;
-	}
-
-	int x, y;
-
-	FindStartVertex(&x, &y);
-
-	// 壁じゃないほうに線を伸ばす
-
-	
-
-}
-
 bool Stage::FindStartVertex(int* x, int* y)
 {
 	int counter = 0;
@@ -306,7 +292,6 @@ bool Stage::FindStartVertex(int* x, int* y)
 		{
 			if (start_.y_ == vertexDistance1_[i].first.y_)
 			{
-				dist[counter] = 0;
 				*x = vertexDistance1_[i].first.x_;
 				*y = vertexDistance1_[i].first.y_;
 				return true;
@@ -323,66 +308,47 @@ bool Stage::FindStartVertex(int* x, int* y)
 	return false;
 }
 
-void Stage::DecisionWay()
+void Stage::SetVertexList()
 {
-	way_.clear();
-	way_.resize(vertexDistance_.size());
-	way_ = vertexDistance_;
-
-
-	dicisionVertex_.clear();
-	// 大きい値で初期化
-	for (int i = 0; i < vertexDistance_.size(); i++)
+	// 頂点をセット
+	for (int y = 0; y < map_.size(); y++)
 	{
-		dicisionVertex_.push_back(std::make_pair())
-		way_[i].second = 1000;
-	}
-
-	// スタートポジションを見つける
-	for (int i = 0; i < way_.size(); i++)
-	{
-		if (start_.x_ == way_[i].first.x_)
+		for (int x = 0; x < map_[0].size(); x++)
 		{
-			if (start_.y_ == way_[i].first.y_)
+			if (map_[y][x] == 2)
 			{
-				way_[i].second = 0;
-				dicisionVertex_.push_back(std::make_pair(way_[i].first, 0));
-				break;
+				vertex v = { VECTOR2{(float)x, (float)y}, 1000, std::vector<vertex>() };
+                vertexList_.push_back(v);
 			}
 		}
 	}
 
-	// ルートはいったん置いておく
-
-	// よくない書き方だけど、ごり押しでとりあえず書く
-
-	// 確認してる頂点を求める
-
-	// 壁じゃない方向に線を伸ばし、次の頂点の位置を求め、距離を求める
-
-	// 頂点情報の距離が現在の距離より大きかったら入れ替える
-
-	int x = dicisionVertex_[i].first.x_;
-	int y = dicisionVertex_[i].first.y_;
-	for (int i = 0; i < DIR::MAX_DIR; i++)
+	// nextをセット 繰り返し3重はよくない
+	for (int i = 0; i < vertexList_.size(); i++)
 	{
-		VECTOR2 check = { (float)x, (float)y };
-		check = check + dir_[i];
-
-		int distance = 1;
-		// 距離を求める式
-		if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
+		for (int direction = 0; direction < DIR::MAX_DIR; direction++)
 		{
-			while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
+			VECTOR2 check = vertexList_[i].position + dir_[direction];
+
+			int distance = 1;
+			// 距離を求める式
+			if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
 			{
-				check = check + dir_[i];
-				distance += 1;
+				while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
+				{
+					check = check + dir_[direction];
+					distance += 1;
+				}
+				for (int j = 0; j < vertexList_.size(); j++)
+				{
+					if (vertexList_[j].position.x == check.x && vertexList_[j].position.y == check.y)
+					{
+						vertexList_[i].next.push_back(vertexList_[j]);
+						break;
+					}
+				}
 			}
-			vInfo current = { x, y, dir_[i] }; // x座標、y座標、方向
-			dicisionVertex_.push_back(std::make_pair(current, 0));
 		}
 	}
-
 }
-
 

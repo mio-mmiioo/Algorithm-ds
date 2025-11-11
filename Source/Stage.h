@@ -13,6 +13,12 @@ struct vInfo1 {
 	int y_;
 };
 
+struct vertex {
+	VECTOR2 position; // 位置情報
+	int distance; // 距離
+	std::vector<vertex> next;
+};
+
 class Stage : public Object2D
 {
 public:
@@ -44,11 +50,10 @@ private:
 	void SetVertexDistance();
 	void CheckDir(int x, int y);
 
-	void DecisionShortestWay();
-
 	bool FindStartVertex(int* x, int* y);
 
-	void DecisionWay();
+	void SetVertexList();
+	void CheckDirVertex(int checkNum);
 
 	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
@@ -59,12 +64,8 @@ private:
 	std::vector<std::pair<vInfo, int>> vertexDistance_; // 割り当てられた頂点番号, 距離
 	std::vector<std::pair<vInfo1, int>> vertexDistance1_; // 割り当てられた頂点番号, 距離 こっちで最終的にはかく
 
-	// 今からかく
-	std::vector<std::pair<vInfo, int>> way_; // 最終的になくなる道
-	std::vector<std::pair<vInfo, int>> dicisionVertex_; // 確認中の頂点 // 頂点の情報と、現在の最短ルート
-	int vertexCount_;
+	vInfo start_;
 
-	// なかったことにするver
-	std::vector<int> dist;
-	vInfo1 start_; // スタートポジション
+	std::vector<vertex> vertexList_;
+
 };
