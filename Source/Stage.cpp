@@ -81,29 +81,29 @@ void Stage::Draw()
 
 	// ’¸“_î•ñ‚Ì•\¦
 	{
-		//int counter = 0;
-		//for (int i = 0; i < vertexList_.size(); i++)
-		//{
-		//	DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
-		//		(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
-		//	for (int j = 0; j < vertexList_[i].next.size(); j++)
-		//	{
-		//		counter += 1;
-		//		DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
-		//			(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
-		//	}
-		//}
+		int counter = 0;
+		for (int i = 0; i < vertexList_.size(); i++)
+		{
+			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
+				(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
+			for (int j = 0; j < vertexList_[i].next.size(); j++)
+			{
+				counter += 1;
+				DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
+					(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
+			}
+		}
 	}
 
 	// “¹î•ñ‚Ì•\¦
 	{
-		for (int i = 0; i < wayList_.size(); i++)
-		{
-			DrawFormatString(500, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
-				(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
-				(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
-				wayList_[i].cost);
-		}
+		//for (int i = 0; i < wayList_.size(); i++)
+		//{
+		//	DrawFormatString(500, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+		//		(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+		//		(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+		//		wayList_[i].cost);
+		//}
 	}
 }
 
@@ -309,16 +309,45 @@ void Stage::FindStartVertex()
 int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
 {
 	way ret;
-	for (int i = 0; i < wayList_.size(); i++)
+	for (int i = 0; i < copyWayList_.size(); i++)
 	{
-		if (wayList_[i].startPos.x == startPos.x && wayList_[i].startPos.y == startPos.y)
+		if (copyWayList_[i].startPos.x == startPos.x && copyWayList_[i].startPos.y == startPos.y)
 		{
-			if (wayList_[i].endPos.y == endPos.y && wayList_[i].endPos.y == endPos.y)
+			if (copyWayList_[i].endPos.y == endPos.y && copyWayList_[i].endPos.y == endPos.y)
 			{
-				ret = wayList_[i];
+				ret = copyWayList_[i];
 			}
 		}
 	}
 	return ret.cost;
+}
+
+void Stage::SetShortestWay(vertex start, vertex end, int cost)
+{
+	copyWayList_ = wayList_;
+	// Ÿ‚ÌêŠ‚Écost‚ğ“ü‚ê‚é
+	for (int i = 0; i < start.next.size(); i++)
+	{
+		start.next[i].distance = cost_ + GetCost(start.position, start.next[i].position);
+		DeleteWay(start, start.next[i]);
+		DeleteWay(start.next[i], start);
+	}
+}
+
+void Stage::DeleteWay(vertex start, vertex end)
+{
+	int deleteNum;
+	for (int i = 0; i < copyWayList_.size(); i++)
+	{
+		if (copyWayList_[i].startPos.x == start.position.x && copyWayList_[i].startPos.y == start.position.y)
+		{
+			if (copyWayList_[i].endPos.y == end.position.y && copyWayList_[i].endPos.y == end.position.y)
+			{
+				deleteNum = i;
+			}
+		}
+	}
+
+	copyWayList_.erase(copyWayList_.begin() + deleteNum);
 }
 

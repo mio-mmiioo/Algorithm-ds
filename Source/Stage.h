@@ -42,20 +42,23 @@ private:
 
 	bool IsWall(VECTOR2 pos);
 	
-	void SetVertexList();
-	bool CheckVertex(int mapX, int mapY);
-
-	void FindStartVertex();
-	int GetCost(VECTOR2 startPos, VECTOR2 endPos);
-
 	VECTOR2 dir_[4];
 	std::vector<std::vector<int>> map_;
 
-	// 経路探索関連
+	// 経路探索の初期情報関連
+	void SetVertexList();
+	bool CheckVertex(int mapX, int mapY);
+	void FindStartVertex();
+	int GetCost(VECTOR2 startPos, VECTOR2 endPos);
+	
 	VECTOR2 goPos_;
 	VECTOR2 start_;
-
 	std::vector<vertex> vertexList_;
-	std::vector<std::vector<VECTOR2>> wayList2_;
 	std::vector<way> wayList_;
+	std::vector<way> copyWayList_;
+
+	// 経路探索
+	void SetShortestWay(vertex start, vertex end, int cost);
+	void DeleteWay(vertex start, vertex end);
+	int cost_; // スタートからの距離
 };
