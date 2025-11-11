@@ -48,9 +48,10 @@ private:
 	// 経路探索の初期情報関連
 	void SetVertexList();
 	bool CheckVertex(int mapX, int mapY);
-	void FindStartVertex();
+	vertex FindStartVertex();
 	int GetCost(VECTOR2 startPos, VECTOR2 endPos);
-	
+	int GetCost(vertex start, vertex end);
+
 	VECTOR2 goPos_;
 	VECTOR2 start_;
 	std::vector<vertex> vertexList_;
@@ -58,7 +59,7 @@ private:
 	std::vector<way> copyWayList_;
 
 	// 経路探索
-	void SetShortestWay(vertex start, vertex end, int cost);
+	void SetShortestWay(vertex start);
 	void DeleteWay(vertex start, vertex end);
 	int cost_; // スタートからの距離
 };

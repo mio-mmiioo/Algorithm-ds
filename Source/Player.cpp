@@ -52,6 +52,11 @@ void Player::Update()
 		position_.x += push;
 	}
 
+	if (CheckHitKey(KEY_INPUT_M))
+	{
+		stage_->SetStartVertex(position_);
+	}
+
 	//if (move.x != 0 || move.y != 0)
 	//{
 	//	position_ = position_ + move * Speed;

@@ -46,10 +46,12 @@ void Stage::Update()
 
 	if (CheckHitKey(KEY_INPUT_C))
 	{
-		FindStartVertex();
+		copyWayList_.resize(wayList_.size());
+		copyWayList_.assign(wayList_.begin(), wayList_.end());
+		SetShortestWay(FindStartVertex());
 	}
 
-	if (CheckHitKey(KEY_INPUT_D))
+	if (CheckHitKey(KEY_INPUT_K))
 	{
 		int cost = 0;
 		cost = GetCost(vertexList_[0].position, vertexList_[1].position);
@@ -290,20 +292,20 @@ bool Stage::CheckVertex(int mapX, int mapY)
 	return ret;
 }
 
-void Stage::FindStartVertex()
+vertex Stage::FindStartVertex()
 {
-	int x;
-	int y;
-	x = start_.x / BOX_WIDTH;
-	y = start_.y / BOX_HEIGHT;
+	vertex ret;
+
 	for (int i = 0; i < vertexList_.size(); i++)
 	{
-		if ((float)x == vertexList_[i].position.x && (float)y == vertexList_[i].position.y)
+		if (start_.x == (int)vertexList_[i].position.x && start_.y == (int)vertexList_[i].position.y)
 		{
 			vertexList_[i].distance = 0;
+			ret = vertexList_[i];
 			break;
 		}
 	}
+	return ret;
 }
 
 int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
@@ -313,7 +315,7 @@ int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
 	{
 		if (copyWayList_[i].startPos.x == startPos.x && copyWayList_[i].startPos.y == startPos.y)
 		{
-			if (copyWayList_[i].endPos.y == endPos.y && copyWayList_[i].endPos.y == endPos.y)
+			if (copyWayList_[i].endPos.x == endPos.x && copyWayList_[i].endPos.y == endPos.y)
 			{
 				ret = copyWayList_[i];
 			}
@@ -322,15 +324,48 @@ int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
 	return ret.cost;
 }
 
-void Stage::SetShortestWay(vertex start, vertex end, int cost)
+int Stage::GetCost(vertex start, vertex end)
 {
-	copyWayList_ = wayList_;
+	way ret;
+	
+	for (int i = 0; i < copyWayList_.size(); i++)
+	{
+		if (copyWayList_[i].startPos.x == start.position.x && copyWayList_[i].startPos.y == start.position.y)
+		{
+			if (copyWayList_[i].endPos.x == end.position.x && copyWayList_[i].endPos.y == end.position.y)
+			{
+				ret = copyWayList_[i];
+			}
+		}
+	}
+
+	return ret.cost;
+}
+
+void Stage::SetShortestWay(vertex start)
+{
 	// 次の場所にcostを入れる
 	for (int i = 0; i < start.next.size(); i++)
 	{
-		start.next[i].distance = cost_ + GetCost(start.position, start.next[i].position);
+		if (start.next[i].distance > start.distance + GetCost(start.position, start.next[i].position))
+		{
+			start.next[i].distance = start.distance + GetCost(start.position, start.next[i].position);
+		}
+
 		DeleteWay(start, start.next[i]);
 		DeleteWay(start.next[i], start);
+	}
+
+	// 現時点で最も近い場所を探す
+	{
+		std::list<int> minDistance;
+		for (int i = 0; i < start.next.size(); i++)
+		{
+			minDistance.push_back(start.next[i].distance);
+		}
+		minDistance.sort();
+
+		DrawFormatString(100, 500, GetColor(255, 255, 255), "スタートからの最小値:%d", minDistance.front());
 	}
 }
 
