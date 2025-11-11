@@ -3,8 +3,6 @@
 #include <vector>
 #include <queue>
 
-using cr_pair = std::pair<int, vInfo1>;
-
 namespace {
 	float BOX_WIDTH = 30;
 	float BOX_HEIGHT = 30;
@@ -35,7 +33,7 @@ Stage::Stage()
 	delete csv;
 	
 	start_ = { 5,1 }; // マジックナンバー、消すこと
-	SetVertexDistance();
+	//SetVertexDistance();
 	SetVertexList();
 }
 
@@ -46,6 +44,11 @@ Stage::~Stage()
 void Stage::Update()
 {
 	CreateGoPos(10 * BOX_WIDTH - BOX_WIDTH / 2, 1 * BOX_HEIGHT + BOX_HEIGHT / 2);
+
+	if (CheckHitKey(KEY_INPUT_C))
+	{
+		FindStartVertex();
+	}
 
 }
 
@@ -139,9 +142,17 @@ int Stage::CheckUp(VECTOR2 pos)
 
 void Stage::SetStartVertex(VECTOR2 pos)
 {
-	int x = (int)pos.x / (int)BOX_WIDTH;
-	int y = (int)pos.y / (int)BOX_HEIGHT;
+	float x = pos.x / BOX_WIDTH;
+	float y = pos.y / BOX_HEIGHT;
 	start_ = { x, y };
+}
+
+void Stage::CreateGoPos(float x, float y)
+{
+	goPos_ = { x, y };
+	int mapX = (int)x / (int)BOX_WIDTH;
+	int mapY = (int)y / (int)BOX_HEIGHT;
+	map_[mapY][mapX] = 3;
 }
 
 bool Stage::IsWall(VECTOR2 pos)
@@ -165,7 +176,55 @@ bool Stage::IsWall(VECTOR2 pos)
 	return true;
 }
 
-bool Stage::SetVertex(int mapX, int mapY)
+void Stage::SetVertexList()
+{
+	// 分岐点を頂点の番号に変更、リストに追加
+	for (int y = 0; y < map_.size(); y++)
+	{
+		for (int x = 0; x < map_[0].size(); x++)
+		{
+			if (map_[y][x] == 0)
+			{
+				if (CheckVertex(x, y) == true) // 一方通行じゃない→分岐地点
+				{
+					map_[y][x] = 2;
+					vertex v = { VECTOR2{(float)x, (float)y}, 1000, std::vector<vertex>() };
+					vertexList_.push_back(v);
+				}
+			}
+		}
+	}
+
+	// nextをセット 繰り返し3重はよくない
+	for (int i = 0; i < vertexList_.size(); i++)
+	{
+		for (int direction = 0; direction < DIR::MAX_DIR; direction++)
+		{
+			VECTOR2 check = vertexList_[i].position + dir_[direction];
+
+			int distance = 1;
+			// 距離を求める式
+			if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
+			{
+				while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
+				{
+					check = check + dir_[direction];
+					distance += 1;
+				}
+				for (int j = 0; j < vertexList_.size(); j++)
+				{
+					if (vertexList_[j].position.x == check.x && vertexList_[j].position.y == check.y)
+					{
+						vertexList_[i].next.push_back(vertexList_[j]);
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+bool Stage::CheckVertex(int mapX, int mapY)
 {
 	int counter = 0;
 	bool ret = false;
@@ -175,7 +234,7 @@ bool Stage::SetVertex(int mapX, int mapY)
 	}
 
 	bool checkDir[DIR::MAX_DIR];
-	
+
 	for (int i = 0; i < DIR::MAX_DIR; i++)
 	{
 		int x = mapX + (int)dir_[i].x;
@@ -218,137 +277,8 @@ bool Stage::SetVertex(int mapX, int mapY)
 	return ret;
 }
 
-void Stage::CreateGoPos(float x, float y)
+void Stage::FindStartVertex()
 {
-	goPos_ = { x, y };
-	int mapX = (int)x / (int)BOX_WIDTH;
-	int mapY = (int)y / (int)BOX_HEIGHT;
-	map_[mapY][mapX] = 3;
-}
 
-void Stage::SetVertexDistance()
-{
-	// 分岐点を頂点にする
-	for (int y = 0; y < map_.size(); y++)
-	{
-		for (int x = 0; x < map_[0].size(); x++)
-		{
-			if (map_[y][x] == 0)
-			{
-				if (SetVertex(x, y) == true) // 一方通行じゃない→分岐地点
-				{
-					map_[y][x] = 2;
-				}
-
-			}
-		}
-	}
-
-	// 頂点と距離を求めて、代入する
-	for (int y = 0; y < map_.size(); y++)
-	{
-		for (int x = 0; x < map_[0].size(); x++)
-		{
-			if (map_[y][x] == 2)
-			{
-				CheckDir(x, y);
-			}
-		}
-	}
-}
-
-void Stage::CheckDir(int x, int y)
-{
-	for (int i = 0; i < DIR::MAX_DIR; i++)
-	{
-		VECTOR2 check = { (float)x, (float)y };
-		check = check + dir_[i];
-
-		int distance = 1;
-		// 距離を求める式
-		if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
-		{
-			while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
-			{
-				check = check + dir_[i];
-				distance += 1;
-			}
-			vInfo current = { x, y, dir_[i] }; // x座標、y座標、方向
-			vInfo1 c = { x, y };
-			vertexDistance_.push_back(std::make_pair(current, distance));
-			vertexDistance1_.push_back(std::make_pair(c, distance));
-		}
-	}
-}
-
-bool Stage::FindStartVertex(int* x, int* y)
-{
-	int counter = 0;
-	int prevX = -1;
-	int prevY = -1;
-	for (int i = 0; i < vertexDistance1_.size(); i++)
-	{
-		if (start_.x_ == vertexDistance1_[i].first.x_)
-		{
-			if (start_.y_ == vertexDistance1_[i].first.y_)
-			{
-				*x = vertexDistance1_[i].first.x_;
-				*y = vertexDistance1_[i].first.y_;
-				return true;
-			}
-		}
-		// 違う座標か確認する
-		if (!(prevX == vertexDistance1_[i].first.x_ && prevY == vertexDistance1_[i].first.y_))
-		{
-			prevX = vertexDistance1_[i].first.x_;
-			prevY = vertexDistance1_[i].first.y_;
-			counter += 1;
-		}
-	}
-	return false;
-}
-
-void Stage::SetVertexList()
-{
-	// 頂点をセット
-	for (int y = 0; y < map_.size(); y++)
-	{
-		for (int x = 0; x < map_[0].size(); x++)
-		{
-			if (map_[y][x] == 2)
-			{
-				vertex v = { VECTOR2{(float)x, (float)y}, 1000, std::vector<vertex>() };
-                vertexList_.push_back(v);
-			}
-		}
-	}
-
-	// nextをセット 繰り返し3重はよくない
-	for (int i = 0; i < vertexList_.size(); i++)
-	{
-		for (int direction = 0; direction < DIR::MAX_DIR; direction++)
-		{
-			VECTOR2 check = vertexList_[i].position + dir_[direction];
-
-			int distance = 1;
-			// 距離を求める式
-			if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
-			{
-				while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
-				{
-					check = check + dir_[direction];
-					distance += 1;
-				}
-				for (int j = 0; j < vertexList_.size(); j++)
-				{
-					if (vertexList_[j].position.x == check.x && vertexList_[j].position.y == check.y)
-					{
-						vertexList_[i].next.push_back(vertexList_[j]);
-						break;
-					}
-				}
-			}
-		}
-	}
 }
 
