@@ -99,8 +99,8 @@ void Stage::Draw()
 		int counter = 0;
 		for (int i = 0; i < vertexList_.size(); i++)
 		{
-			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d, %d",
-				(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance, vertexList_[i].number);
+			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
+				(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
 			//for (int j = 0; j < vertexList_[i].next.size(); j++)
 			//{
 			//	counter += 1;
@@ -382,9 +382,9 @@ void Stage::SetShortestWay(vertex start)
 					}
 				}
 			}
-		}
-		//DeleteWay(start, start.next[i]);
-		//DeleteWay(start.next[i], start);
+		}/*
+		DeleteWay(start, start.next[i]);
+		DeleteWay(start.next[i], start);*/
 	}
 
 	// 現時点で最も近い場所を探す
@@ -395,14 +395,7 @@ void Stage::SetShortestWay(vertex start)
 			if (vertexList_[vertexList_[start.number].next[i].number].isDicision == false)
 			{
 				sortMinDistance.push_back(vertexList_[start.number].next[i]);
-			}			
-
-			//// サイズが1ならそのまま
-			//if (vertexList_[start.number].next.size() == 1)
-			//{
-			//	return;
-			//}
-
+			}
 			// サイズが2以上ならソートする
 			for (int j = sortMinDistance.size() - 2; j >= 0; j--)
 			{
@@ -411,11 +404,42 @@ void Stage::SetShortestWay(vertex start)
 					std::swap(sortMinDistance[j], sortMinDistance[j + 1]);
 				}
 			}
+			//for (int j = checkVertexList_.size() - 2; j >= 0; j--)
+			//{
+			//	if (checkVertexList_[j].distance > checkVertexList_[j + 1].distance)
+			//	{
+			//		std::swap(checkVertexList_[j].distance, checkVertexList_[j + 1].distance);
+			//	}
+			//}
 		}
 
+		bool isAdd = true;
 		for (int i = 0; i < sortMinDistance.size(); i++)
 		{
 			checkVertexList_.push_back(sortMinDistance[i]);
+
+			for (int j = checkVertexList_.size() - 2; j >= 0; j--)
+			{
+				if (checkVertexList_[j].distance > checkVertexList_[j + 1].distance)
+				{
+					std::swap(checkVertexList_[j].distance, checkVertexList_[j + 1].distance);
+				}
+			}
+			//for (int j = 0; j < checkVertexList_.size(); j++)
+			//{
+			//	if (checkVertexList_[j].position.x == sortMinDistance[i].position.x && checkVertexList_[j].position.y == sortMinDistance[i].position.y)
+			//	{
+			//		isAdd = false;
+			//	}
+			//	else
+			//	{
+			//		isAdd = true;
+			//	}
+			//}
+			//if (isAdd == true)
+			//{
+			//	checkVertexList_.push_back(sortMinDistance[i]);
+			//}
 		}
 	}
 }
