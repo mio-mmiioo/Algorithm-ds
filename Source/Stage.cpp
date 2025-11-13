@@ -104,13 +104,13 @@ void Stage::Draw()
 
 	// “¹î•ñ‚Ì•\¦
 	{
-		//for (int i = 0; i < wayList_.size(); i++)
-		//{
-		//	DrawFormatString(500, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
-		//		(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
-		//		(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
-		//		wayList_[i].cost);
-		//}
+		for (int i = 0; i < wayList_.size(); i++)
+		{
+			DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+				(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+				(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+				wayList_[i].cost);
+		}
 	}
 }
 
@@ -389,7 +389,7 @@ void Stage::DeleteWay(vertex start, vertex end)
 	{
 		if (copyWayList_[i].startPos.x == start.position.x && copyWayList_[i].startPos.y == start.position.y)
 		{
-			if (copyWayList_[i].endPos.y == end.position.y && copyWayList_[i].endPos.y == end.position.y)
+			if (copyWayList_[i].endPos.x == end.position.x && copyWayList_[i].endPos.y == end.position.y)
 			{
 				deleteNum = i;
 			}
