@@ -48,7 +48,12 @@ void Stage::Update()
 	{
 		copyWayList_.resize(wayList_.size());
 		copyWayList_.assign(wayList_.begin(), wayList_.end());
-		SetShortestWay(FindStartVertex());
+		for (int i = 0; i < vertexList_.size(); i++)
+		{
+			vertexList_[i].distance = 1000;
+		}
+		vertex start = FindStartVertex();
+		SetShortestWay(start);
 	}
 
 	if (CheckHitKey(KEY_INPUT_K))
@@ -155,9 +160,9 @@ int Stage::CheckUp(VECTOR2 pos)
 
 void Stage::SetStartVertex(VECTOR2 pos)
 {
-	float x = pos.x / BOX_WIDTH;
-	float y = pos.y / BOX_HEIGHT;
-	start_ = { x, y };
+	int x = pos.x / BOX_WIDTH;
+	int y = pos.y / BOX_HEIGHT;
+	start_ = { (float)x, (float)y };
 }
 
 void Stage::CreateGoPos(float x, float y)
@@ -350,6 +355,14 @@ void Stage::SetShortestWay(vertex start)
 		if (start.next[i].distance > start.distance + GetCost(start.position, start.next[i].position))
 		{
 			start.next[i].distance = start.distance + GetCost(start.position, start.next[i].position);
+			
+			for (int j = 0; j < vertexList_.size(); j++)
+			{
+				if (vertexList_[j].position.x == start.next[i].position.x && vertexList_[j].position.y == start.next[i].position.y)
+				{
+					vertexList_[j].distance = start.next[i].distance;
+				}
+			}
 		}
 
 		DeleteWay(start, start.next[i]);
@@ -371,7 +384,7 @@ void Stage::SetShortestWay(vertex start)
 
 void Stage::DeleteWay(vertex start, vertex end)
 {
-	int deleteNum;
+	int deleteNum = -1;
 	for (int i = 0; i < copyWayList_.size(); i++)
 	{
 		if (copyWayList_[i].startPos.x == start.position.x && copyWayList_[i].startPos.y == start.position.y)
