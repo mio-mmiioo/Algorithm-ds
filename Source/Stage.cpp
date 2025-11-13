@@ -51,9 +51,17 @@ void Stage::Update()
 		for (int i = 0; i < vertexList_.size(); i++)
 		{
 			vertexList_[i].distance = 1000;
+			vertexList_[i].isDicision = false;
 		}
+
 		vertex start = FindStartVertex();
 		SetShortestWay(start);
+		while (!checkVertexList_.empty())
+		{
+			SetShortestWay(checkVertexList_.front());
+			checkVertexList_.erase(checkVertexList_.begin());
+		}
+
 	}
 
 	if (CheckHitKey(KEY_INPUT_K))
@@ -91,14 +99,14 @@ void Stage::Draw()
 		int counter = 0;
 		for (int i = 0; i < vertexList_.size(); i++)
 		{
-			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
-				(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
-			for (int j = 0; j < vertexList_[i].next.size(); j++)
-			{
-				counter += 1;
-				DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
-					(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
-			}
+			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d, %d",
+				(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance, vertexList_[i].number);
+			//for (int j = 0; j < vertexList_[i].next.size(); j++)
+			//{
+			//	counter += 1;
+			//	DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
+			//		(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
+			//}
 		}
 	}
 
@@ -206,7 +214,7 @@ void Stage::SetVertexList()
 				if (CheckVertex(x, y) == true) // 一方通行じゃない→分岐地点
 				{
 					map_[y][x] = 2;
-					vertex v = { VECTOR2{(float)x, (float)y}, 1000, std::vector<vertex>() };
+					vertex v = { VECTOR2{(float)x, (float)y}, 1000, vertexList_.size(), false, std::vector<vertex>()};
 					vertexList_.push_back(v);
 				}
 			}
@@ -306,6 +314,7 @@ vertex Stage::FindStartVertex()
 		if (start_.x == (int)vertexList_[i].position.x && start_.y == (int)vertexList_[i].position.y)
 		{
 			vertexList_[i].distance = 0;
+			vertexList_[i].isDicision = true;
 			ret = vertexList_[i];
 			break;
 		}
@@ -315,18 +324,17 @@ vertex Stage::FindStartVertex()
 
 int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
 {
-	way ret;
 	for (int i = 0; i < copyWayList_.size(); i++)
 	{
 		if (copyWayList_[i].startPos.x == startPos.x && copyWayList_[i].startPos.y == startPos.y)
 		{
 			if (copyWayList_[i].endPos.x == endPos.x && copyWayList_[i].endPos.y == endPos.y)
 			{
-				ret = copyWayList_[i];
+				return copyWayList_[i].cost;
 			}
 		}
 	}
-	return ret.cost;
+	return 1000;
 }
 
 int Stage::GetCost(vertex start, vertex end)
@@ -339,46 +347,76 @@ int Stage::GetCost(vertex start, vertex end)
 		{
 			if (copyWayList_[i].endPos.x == end.position.x && copyWayList_[i].endPos.y == end.position.y)
 			{
-				ret = copyWayList_[i];
+				return copyWayList_[i].cost;
 			}
 		}
 	}
 
-	return ret.cost;
+	return 1000;
 }
 
 void Stage::SetShortestWay(vertex start)
 {
-	// 次の場所にcostを入れる
-	for (int i = 0; i < start.next.size(); i++)
+	// 今確認中の頂点を決定済みにする
+	for (int i = 0; i < vertexList_.size(); i++)
 	{
-		if (start.next[i].distance > start.distance + GetCost(start.position, start.next[i].position))
+		if (vertexList_[i].position.x == start.position.x && vertexList_[i].position.y == start.position.y)
 		{
-			start.next[i].distance = start.distance + GetCost(start.position, start.next[i].position);
-			
+			vertexList_[i].isDicision = true;
+		}
+	}
+
+	// 次の場所にcostを入れる
+	for (int i = 0; i < vertexList_[start.number].next.size(); i++)
+	{
+		int checkDistance = vertexList_[start.number].distance + GetCost(vertexList_[start.number].position, vertexList_[start.number].next[i].position);
+		if (vertexList_[start.number].next[i].distance > checkDistance)
+		{
 			for (int j = 0; j < vertexList_.size(); j++)
 			{
-				if (vertexList_[j].position.x == start.next[i].position.x && vertexList_[j].position.y == start.next[i].position.y)
+				if (vertexList_[j].isDicision == false)
 				{
-					vertexList_[j].distance = start.next[i].distance;
+					if (vertexList_[j].position.x == vertexList_[start.number].next[i].position.x && vertexList_[j].position.y == vertexList_[start.number].next[i].position.y)
+					{
+						vertexList_[j].distance = checkDistance;
+					}
 				}
 			}
 		}
-
-		DeleteWay(start, start.next[i]);
-		DeleteWay(start.next[i], start);
+		//DeleteWay(start, start.next[i]);
+		//DeleteWay(start.next[i], start);
 	}
 
 	// 現時点で最も近い場所を探す
 	{
-		std::list<int> minDistance;
-		for (int i = 0; i < start.next.size(); i++)
+		std::vector<vertex> sortMinDistance;
+		for (int i = 0; i < vertexList_[start.number].next.size(); i++)
 		{
-			minDistance.push_back(start.next[i].distance);
-		}
-		minDistance.sort();
+			if (vertexList_[vertexList_[start.number].next[i].number].isDicision == false)
+			{
+				sortMinDistance.push_back(vertexList_[start.number].next[i]);
+			}			
 
-		DrawFormatString(100, 500, GetColor(255, 255, 255), "スタートからの最小値:%d", minDistance.front());
+			//// サイズが1ならそのまま
+			//if (vertexList_[start.number].next.size() == 1)
+			//{
+			//	return;
+			//}
+
+			// サイズが2以上ならソートする
+			for (int j = sortMinDistance.size() - 2; j >= 0; j--)
+			{
+				if (sortMinDistance[j].distance > sortMinDistance[j + 1].distance)
+				{
+					std::swap(sortMinDistance[j], sortMinDistance[j + 1]);
+				}
+			}
+		}
+
+		for (int i = 0; i < sortMinDistance.size(); i++)
+		{
+			checkVertexList_.push_back(sortMinDistance[i]);
+		}
 	}
 }
 
@@ -392,6 +430,7 @@ void Stage::DeleteWay(vertex start, vertex end)
 			if (copyWayList_[i].endPos.x == end.position.x && copyWayList_[i].endPos.y == end.position.y)
 			{
 				deleteNum = i;
+				break;
 			}
 		}
 	}

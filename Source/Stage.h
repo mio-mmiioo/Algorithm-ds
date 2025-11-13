@@ -5,6 +5,8 @@
 struct vertex {
 	VECTOR2 position; // ˆÊ’uî•ñ
 	int distance; // ‹——£
+	int number;
+	bool isDicision; // Œˆ’è‚µ‚Ä‚¢‚é‚©
 	std::vector<vertex> next;
 };
 
@@ -55,6 +57,7 @@ private:
 	VECTOR2 goPos_;
 	VECTOR2 start_;
 	std::vector<vertex> vertexList_;
+	std::vector<vertex> checkVertexList_;
 	std::vector<way> wayList_;
 	std::vector<way> copyWayList_;
 
