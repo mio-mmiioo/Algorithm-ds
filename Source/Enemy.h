@@ -18,4 +18,6 @@ private:
 	VECTOR2 endPos_;
 	Stage* stage_;
 	VECTOR2 move;
+
+	bool isArrive_;
 };

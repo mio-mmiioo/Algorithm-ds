@@ -42,7 +42,7 @@ Stage::~Stage()
 
 void Stage::Update()
 {
-	CreateGoPos(10 * BOX_WIDTH - BOX_WIDTH / 2, 1 * BOX_HEIGHT + BOX_HEIGHT / 2);
+	//CreateGoPos(10 * BOX_WIDTH - BOX_WIDTH / 2, 1 * BOX_HEIGHT + BOX_HEIGHT / 2);
 
 	if (CheckHitKey(KEY_INPUT_C))
 	{
@@ -191,7 +191,7 @@ void Stage::CreateGoPos(float x, float y)
 	goPos_ = { x, y };
 	int mapX = (int)x / (int)BOX_WIDTH;
 	int mapY = (int)y / (int)BOX_HEIGHT;
-	map_[mapY][mapX] = 3;
+	//map_[mapY][mapX] = 3;
 }
 
 std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
@@ -205,6 +205,13 @@ std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
 		{
 			if (vertexList_[i].position.y == y)
 			{
+				int checkNum = vertexList_[i].posList.size() - 1;
+				while (vertexList_[i].posList[checkNum].position.x == vertexList_[i].posList[checkNum - 1].position.x &&
+					vertexList_[i].posList[checkNum].position.y == vertexList_[i].posList[checkNum - 1].position.y)
+				{
+					vertexList_[i].posList.pop_back();
+					checkNum -= 1;
+				}
 				return vertexList_[i].posList;
 			}
 		}
