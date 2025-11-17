@@ -2,11 +2,13 @@
 #include <DxLib.h>
 #include "Stage.h"
 #include "Player.h"
+#include "Enemy.h"
 
 PlayScene::PlayScene()
 {
 	new Stage();
 	new Player();
+	new Enemy();
 }
 
 PlayScene::~PlayScene()

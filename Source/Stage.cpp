@@ -52,6 +52,7 @@ void Stage::Update()
 		{
 			vertexList_[i].distance = 1000;
 			vertexList_[i].isDicision = false;
+			vertexList_[i].posList.clear();
 		}
 
 		vertex start = FindStartVertex();
@@ -112,12 +113,23 @@ void Stage::Draw()
 
 	// ìπèÓïÒÇÃï\é¶
 	{
-		for (int i = 0; i < wayList_.size(); i++)
+		//for (int i = 0; i < wayList_.size(); i++)
+		//{
+		//	DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+		//		(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+		//		(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+		//		wayList_[i].cost);
+		//}
+	}
+
+	int count = 0;
+	for (int i = 0; i < vertexList_.size(); i++)
+	{
+		for (int j = 0; j < vertexList_[i].posList.size(); j++)
 		{
-			DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
-				(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
-				(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
-				wayList_[i].cost);
+			DrawFormatString(800, (i + count) * 30, GetColor(255, 255, 255), "%d:(x:%d, y:%d)",
+				j, (int)vertexList_[i].posList[j].position.x, (int)vertexList_[i].posList[j].position.y);
+			count += 1;
 		}
 	}
 }
@@ -166,6 +178,7 @@ int Stage::CheckUp(VECTOR2 pos)
 	return (int)BOX_HEIGHT - dy;
 }
 
+
 void Stage::SetStartVertex(VECTOR2 pos)
 {
 	int x = pos.x / BOX_WIDTH;
@@ -180,6 +193,24 @@ void Stage::CreateGoPos(float x, float y)
 	int mapY = (int)y / (int)BOX_HEIGHT;
 	map_[mapY][mapX] = 3;
 }
+
+std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
+{
+	int x = pos.x / BOX_WIDTH;
+	int y = pos.y / BOX_HEIGHT;
+
+	for (int i = 0; i < vertexList_.size(); i++)
+	{
+		if (vertexList_[i].position.x == x)
+		{
+			if (vertexList_[i].position.y == y)
+			{
+				return vertexList_[i].posList;
+			}
+		}
+	}
+}
+
 
 bool Stage::IsWall(VECTOR2 pos)
 {
@@ -201,6 +232,8 @@ bool Stage::IsWall(VECTOR2 pos)
 	}
 	return true;
 }
+
+
 
 void Stage::SetVertexList()
 {
@@ -363,6 +396,7 @@ void Stage::SetShortestWay(vertex start)
 		if (vertexList_[i].position.x == start.position.x && vertexList_[i].position.y == start.position.y)
 		{
 			vertexList_[i].isDicision = true;
+			vertexList_[i].posList.push_back(start);
 		}
 	}
 
@@ -379,6 +413,8 @@ void Stage::SetShortestWay(vertex start)
 					if (vertexList_[j].position.x == vertexList_[start.number].next[i].position.x && vertexList_[j].position.y == vertexList_[start.number].next[i].position.y)
 					{
 						vertexList_[j].distance = checkDistance;
+						vertexList_[j].posList.resize(vertexList_[start.number].posList.size());
+						vertexList_[j].posList.assign(vertexList_[start.number].posList.begin(), vertexList_[start.number].posList.end());
 					}
 				}
 			}

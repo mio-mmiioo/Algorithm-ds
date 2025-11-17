@@ -8,6 +8,7 @@ struct vertex {
 	int number;
 	bool isDicision; // Œˆ’è‚µ‚Ä‚¢‚é‚©
 	std::vector<vertex> next;
+	std::vector<vertex> posList;
 };
 
 struct way {
@@ -32,6 +33,8 @@ public:
 	VECTOR2 GetGoPos() { return goPos_; }
 	void SetStartVertex(VECTOR2 pos);
 	void CreateGoPos(float x, float y);
+
+	std::vector<vertex> GetShortestWay(VECTOR2 pos);
 
 private:
 	enum DIR {
