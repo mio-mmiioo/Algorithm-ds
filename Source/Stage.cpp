@@ -113,25 +113,25 @@ void Stage::Draw()
 
 	// “¹î•ñ‚Ì•\¦
 	{
-		//for (int i = 0; i < wayList_.size(); i++)
-		//{
-		//	DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
-		//		(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
-		//		(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
-		//		wayList_[i].cost);
-		//}
-	}
-
-	int count = 0;
-	for (int i = 0; i < vertexList_.size(); i++)
-	{
-		for (int j = 0; j < vertexList_[i].posList.size(); j++)
+		for (int i = 0; i < wayList_.size(); i++)
 		{
-			DrawFormatString(800, (i + count) * 30, GetColor(255, 255, 255), "%d:(x:%d, y:%d)",
-				j, (int)vertexList_[i].posList[j].position.x, (int)vertexList_[i].posList[j].position.y);
-			count += 1;
+			DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+				(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+				(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+				wayList_[i].cost);
 		}
 	}
+
+	//int count = 0;
+	//for (int i = 0; i < vertexList_.size(); i++)
+	//{
+	//	for (int j = 0; j < vertexList_[i].posList.size(); j++)
+	//	{
+	//		DrawFormatString(800, (i + count) * 30, GetColor(255, 255, 255), "%d:(x:%d, y:%d)",
+	//			j, (int)vertexList_[i].posList[j].position.x, (int)vertexList_[i].posList[j].position.y);
+	//		count += 1;
+	//	}
+	//}
 }
 
 int Stage::CheckRight(VECTOR2 pos)
@@ -212,6 +212,8 @@ std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
 					vertexList_[i].posList.pop_back();
 					checkNum -= 1;
 				}
+
+				SetWay(vertexList_[i].posList);
 				return vertexList_[i].posList;
 			}
 		}
@@ -393,6 +395,23 @@ int Stage::GetCost(vertex start, vertex end)
 	}
 
 	return 1000;
+}
+
+void Stage::SetWay(std::vector<vertex> vertexList)
+{
+	for (int i = 0; i < map_.size(); i++)
+	{
+		for (int j = 0; j < map_[i].size(); j++)
+		{
+			for (int k = 0; k < vertexList.size(); k++)
+			{
+				if (i == (int)vertexList[k].position.x && j == (int)vertexList[k].position.y)
+				{
+					map_[j][i] = 3;
+				}
+			}
+		}
+	}
 }
 
 void Stage::SetShortestWay(vertex start)

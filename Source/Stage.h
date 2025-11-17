@@ -57,6 +57,8 @@ private:
 	int GetCost(VECTOR2 startPos, VECTOR2 endPos);
 	int GetCost(vertex start, vertex end);
 
+	void SetWay(std::vector<vertex> vertexList);
+
 	VECTOR2 goPos_;
 	VECTOR2 start_;
 	std::vector<vertex> vertexList_;
