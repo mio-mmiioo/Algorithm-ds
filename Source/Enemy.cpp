@@ -85,6 +85,24 @@ void Enemy::Draw()
 		{
 			DrawFormatString(10, 560 + i * 30, GetColor(255, 255, 255), "%d:(%d, %d)", i, (int)way_[i].position.x, (int)way_[i].position.y);
 		}
+
+		// ’Ê‚è“¹‚Ì•\Ž¦
+		for (int i = 0; i < way_.size(); i++)
+		{
+			if (i == way_.size() - 1)
+			{
+				DrawLine(position_.x, position_.y,
+					(int)way_[i].position.x * 30 + 15, (int)way_[i].position.y * 30 + 15,
+					GetColor(0, 0, 255), TRUE);
+			}
+			else if (i < way_.size() - 1)
+			{
+				DrawLine((int)way_[i].position.x * 30 + 15, (int)way_[i].position.y * 30 + 15,
+					(int)way_[i + 1].position.x * 30 + 15, (int)way_[i + 1].position.y * 30 + 15,
+					GetColor(0, 0, 255), TRUE);
+			}
+		}
+		
 	}
 }
 

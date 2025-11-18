@@ -6,7 +6,6 @@
 namespace {
 	float BOX_WIDTH = 30;
 	float BOX_HEIGHT = 30;
-
 }
 
 Stage::Stage()
@@ -213,7 +212,7 @@ std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
 					checkNum -= 1;
 				}
 
-				SetWay(vertexList_[i].posList);
+				//SetWay(vertexList_[i].posList);
 				return vertexList_[i].posList;
 			}
 		}
