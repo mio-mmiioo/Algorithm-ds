@@ -5,7 +5,7 @@
 Enemy::Enemy()
 {
 	hImage_ = LoadGraph("data/chara.png");
-	position_ = VECTOR2(46.0f, 46.0f);
+	position_ = VECTOR2((float)(BOX_SIZE + BOX_SIZE / 2), (float)(BOX_SIZE + BOX_SIZE / 2));
 	isArrive_ = false;
 
 	stage_ = FindGameObject<Stage>();
@@ -26,7 +26,7 @@ void Enemy::Update()
 		isArrive_ = false;
 		way_.resize(stage_->GetShortestWay(position_).size());
 		way_ = stage_->GetShortestWay(position_);
-		endPos_ = way_[0].position * 30.0f;
+		endPos_ = way_[0].position * (float)BOX_SIZE;
 	}
 
 	if (isArrive_ == true)
@@ -34,12 +34,12 @@ void Enemy::Update()
 		return;
 	}
 
-	if (!(((int)position_.x / 30 == (int)endPos_.x / 30) && ((int)position_.y / 30 == (int)endPos_.y / 30)))
+	if (!(((int)position_.x / BOX_SIZE == (int)endPos_.x / BOX_SIZE) && ((int)position_.y / BOX_SIZE == (int)endPos_.y / BOX_SIZE)))
 	{
 		if (way_.size() > 0)
 		{
-			int x = position_.x / 30;
-			int y = position_.y / 30;
+			int x = position_.x / BOX_SIZE;
+			int y = position_.y / BOX_SIZE;
 			if (way_[way_.size() - 1].position.x == x && way_[way_.size() - 1].position.y == y)
 			{
 				way_.pop_back();
@@ -57,10 +57,10 @@ void Enemy::Update()
 
 	if (way_.size() > 0)
 	{
-		if ((int)(position_.x / 30) == (int)way_[way_.size() - 1].position.x && (int)(position_.y / 30) == (int)way_[way_.size() - 1].position.y)
+		if ((int)(position_.x / BOX_SIZE) == (int)way_[way_.size() - 1].position.x && (int)(position_.y / BOX_SIZE) == (int)way_[way_.size() - 1].position.y)
 		{
-			position_.x = way_[way_.size() - 1].position.x * 30.0f + 15.0f;
-			position_.y = way_[way_.size() - 1].position.y * 30.0f + 15.0f;
+			position_.x = way_[way_.size() - 1].position.x * (float)BOX_SIZE + (float)BOX_SIZE / 2;
+			position_.y = way_[way_.size() - 1].position.y * (float)BOX_SIZE + (float)BOX_SIZE / 2;
 		}
 	}
 	else
@@ -92,13 +92,13 @@ void Enemy::Draw()
 			if (i == way_.size() - 1)
 			{
 				DrawLine(position_.x, position_.y,
-					(int)way_[i].position.x * 30 + 15, (int)way_[i].position.y * 30 + 15,
+					(int)way_[i].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i].position.y * BOX_SIZE + BOX_SIZE / 2,
 					GetColor(0, 0, 255), TRUE);
 			}
 			else if (i < way_.size() - 1)
 			{
-				DrawLine((int)way_[i].position.x * 30 + 15, (int)way_[i].position.y * 30 + 15,
-					(int)way_[i + 1].position.x * 30 + 15, (int)way_[i + 1].position.y * 30 + 15,
+				DrawLine((int)way_[i].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i].position.y * BOX_SIZE + BOX_SIZE / 2,
+					(int)way_[i + 1].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i + 1].position.y * BOX_SIZE + BOX_SIZE / 2,
 					GetColor(0, 0, 255), TRUE);
 			}
 		}
@@ -106,7 +106,3 @@ void Enemy::Draw()
 	}
 }
 
-void Enemy::ToGo()
-{
-
-}

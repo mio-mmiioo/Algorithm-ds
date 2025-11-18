@@ -2,6 +2,11 @@
 #include "../Library/Object2D.h"
 #include <vector>
 
+namespace {
+	int BOX_SIZE = 30;
+	int MAX_DISTANCE = 1000;
+}
+
 struct vertex {
 	VECTOR2 position; // 位置情報
 	int distance; // 距離
@@ -45,6 +50,13 @@ private:
 		MAX_DIR
 	};
 
+	enum MAP_NUM {
+		EMPTY,
+		WALL,
+		BRANCH,
+		MAX_MAP_NUM
+	};
+
 	bool IsWall(VECTOR2 pos);
 	
 	VECTOR2 dir_[4];
@@ -57,8 +69,6 @@ private:
 	int GetCost(VECTOR2 startPos, VECTOR2 endPos);
 	int GetCost(vertex start, vertex end);
 
-	void SetWay(std::vector<vertex> vertexList);
-
 	VECTOR2 goPos_;
 	VECTOR2 start_;
 	std::vector<vertex> vertexList_;
@@ -68,6 +78,5 @@ private:
 
 	// 経路探索
 	void SetShortestWay(vertex start);
-	void DeleteWay(vertex start, vertex end);
 	int cost_; // スタートからの距離
 };

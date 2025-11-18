@@ -11,7 +11,6 @@ public:
 	~Enemy();
 	void Update() override;
 	void Draw() override;
-	void ToGo();
 
 private:
 	std::vector<vertex> way_;

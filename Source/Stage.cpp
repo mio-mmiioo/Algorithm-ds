@@ -3,11 +3,6 @@
 #include <vector>
 #include <queue>
 
-namespace {
-	float BOX_WIDTH = 30;
-	float BOX_HEIGHT = 30;
-}
-
 Stage::Stage()
 {
 	dir_[RIGHT] = {  1,  0 };
@@ -31,7 +26,7 @@ Stage::Stage()
 	}
 	delete csv;
 	
-	start_ = { 5,1 }; // マジックナンバー、消すこと
+	start_ = { -1, -1 };
 	SetVertexList();
 }
 
@@ -41,15 +36,13 @@ Stage::~Stage()
 
 void Stage::Update()
 {
-	//CreateGoPos(10 * BOX_WIDTH - BOX_WIDTH / 2, 1 * BOX_HEIGHT + BOX_HEIGHT / 2);
-
 	if (CheckHitKey(KEY_INPUT_C))
 	{
 		copyWayList_.resize(wayList_.size());
 		copyWayList_.assign(wayList_.begin(), wayList_.end());
 		for (int i = 0; i < vertexList_.size(); i++)
 		{
-			vertexList_[i].distance = 1000;
+			vertexList_[i].distance = MAX_DISTANCE;
 			vertexList_[i].isDicision = false;
 			vertexList_[i].posList.clear();
 		}
@@ -63,12 +56,6 @@ void Stage::Update()
 		}
 
 	}
-
-	if (CheckHitKey(KEY_INPUT_K))
-	{
-		int cost = 0;
-		cost = GetCost(vertexList_[0].position, vertexList_[1].position);
-	}
 }
 
 void Stage::Draw()
@@ -77,60 +64,60 @@ void Stage::Draw()
 	{
 		for (int x = 0; x < map_[0].size(); x++)
 		{
-			if (map_[y][x] == 1)
+			if (map_[y][x] == MAP_NUM::WALL)
 			{
-				DrawBox(x * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, x * (int)BOX_WIDTH + (int)BOX_WIDTH, y * (int)BOX_HEIGHT + (int)BOX_HEIGHT, GetColor(255, 255, 255), TRUE);
+				DrawBox(x * (int)BOX_SIZE, y * (int)BOX_SIZE, x * (int)BOX_SIZE + (int)BOX_SIZE, y * (int)BOX_SIZE + (int)BOX_SIZE, GetColor(255, 255, 255), TRUE);
 			}
-			if (map_[y][x] == 2)
+			if (map_[y][x] == MAP_NUM::BRANCH)
 			{
-				DrawBox(x * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, x * (int)BOX_WIDTH + (int)BOX_WIDTH, y * (int)BOX_HEIGHT + (int)BOX_HEIGHT, GetColor(100, 200, 100), TRUE);
+				DrawBox(x * (int)BOX_SIZE, y * (int)BOX_SIZE, x * (int)BOX_SIZE + (int)BOX_SIZE, y * (int)BOX_SIZE + (int)BOX_SIZE, GetColor(100, 200, 100), TRUE);
 			}
-			if (map_[y][x] == 3)
-			{
-				DrawBox(x * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, x * (int)BOX_WIDTH + (int)BOX_WIDTH, y * (int)BOX_HEIGHT + (int)BOX_HEIGHT, GetColor(100, 100, 200), TRUE);
-			}
-			DrawLine(x * (int)BOX_WIDTH, 0, x * (int)BOX_WIDTH, (int)map_.size() * (int)BOX_HEIGHT, GetColor(0, 0, 0)); // 縦
-			DrawLine(0, y * (int)BOX_HEIGHT, (int)map_[0].size() * (int)BOX_WIDTH, y * (int)BOX_HEIGHT, GetColor(0, 0, 0)); // 横
+			DrawLine(x * (int)BOX_SIZE, 0, x * (int)BOX_SIZE, (int)map_.size() * (int)BOX_SIZE, GetColor(0, 0, 0)); // 縦
+			DrawLine(0, y * (int)BOX_SIZE, (int)map_[0].size() * (int)BOX_SIZE, y * (int)BOX_SIZE, GetColor(0, 0, 0)); // 横
 		}
 	}
 
-	// 頂点情報の表示
+	// 消す・表示のために書いてる
 	{
-		int counter = 0;
-		for (int i = 0; i < vertexList_.size(); i++)
+		// 頂点情報の表示
 		{
-			DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
-				(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
-			//for (int j = 0; j < vertexList_[i].next.size(); j++)
-			//{
-			//	counter += 1;
-			//	DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
-			//		(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
-			//}
+			int counter = 0;
+			for (int i = 0; i < vertexList_.size(); i++)
+			{
+				DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "x:%d, y:%d, distance:%d",
+					(int)vertexList_[i].position.x, (int)vertexList_[i].position.y, vertexList_[i].distance);
+				//for (int j = 0; j < vertexList_[i].next.size(); j++)
+				//{
+				//	counter += 1;
+				//	DrawFormatString(500, (i + counter) * 30, GetColor(255, 255, 255), "next(x:%d, y:%d)",
+				//		(int)vertexList_[i].next[j].position.x, (int)vertexList_[i].next[j].position.y);
+				//}
+			}
 		}
-	}
 
-	// 道情報の表示
-	{
-		for (int i = 0; i < wayList_.size(); i++)
+		// 道情報の表示
 		{
-			DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
-				(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
-				(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
-				wayList_[i].cost);
+			for (int i = 0; i < wayList_.size(); i++)
+			{
+				DrawFormatString(800, i * 30, GetColor(255, 255, 255), "start(x:%d, y:%d), end(x:%d, y:%d), cost:%d",
+					(int)wayList_[i].startPos.x, (int)wayList_[i].startPos.y,
+					(int)wayList_[i].endPos.x, (int)wayList_[i].endPos.y,
+					wayList_[i].cost);
+			}
 		}
-	}
 
-	//int count = 0;
-	//for (int i = 0; i < vertexList_.size(); i++)
-	//{
-	//	for (int j = 0; j < vertexList_[i].posList.size(); j++)
-	//	{
-	//		DrawFormatString(800, (i + count) * 30, GetColor(255, 255, 255), "%d:(x:%d, y:%d)",
-	//			j, (int)vertexList_[i].posList[j].position.x, (int)vertexList_[i].posList[j].position.y);
-	//		count += 1;
-	//	}
-	//}
+		//int count = 0;
+		//for (int i = 0; i < vertexList_.size(); i++)
+		//{
+		//	for (int j = 0; j < vertexList_[i].posList.size(); j++)
+		//	{
+		//		DrawFormatString(800, (i + count) * 30, GetColor(255, 255, 255), "%d:(x:%d, y:%d)",
+		//			j, (int)vertexList_[i].posList[j].position.x, (int)vertexList_[i].posList[j].position.y);
+		//		count += 1;
+		//	}
+		//}
+
+	}
 }
 
 int Stage::CheckRight(VECTOR2 pos)
@@ -139,8 +126,8 @@ int Stage::CheckRight(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int x = (int)pos.x / (int)BOX_WIDTH;
-	int dx = (int)pos.x - x * (int)BOX_WIDTH; // チップの中の座標
+	int x = (int)pos.x / (int)BOX_SIZE;
+	int dx = (int)pos.x - x * (int)BOX_SIZE; // チップの中の座標
 	return dx + 1;
 }
 
@@ -150,9 +137,9 @@ int Stage::CheckLeft(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int x = (int)pos.x / (int)BOX_WIDTH;
-	int dx = (int)pos.x - x * (int)BOX_WIDTH; // チップの中の座標
-	return (int)BOX_WIDTH - dx;
+	int x = (int)pos.x / (int)BOX_SIZE;
+	int dx = (int)pos.x - x * (int)BOX_SIZE; // チップの中の座標
+	return (int)BOX_SIZE - dx;
 }
 
 int Stage::CheckDown(VECTOR2 pos)
@@ -161,8 +148,8 @@ int Stage::CheckDown(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int y = (int)pos.y / (int)BOX_HEIGHT;
-	int dy = (int)pos.y - y * (int)BOX_HEIGHT; // チップの中の座標
+	int y = (int)pos.y / (int)BOX_SIZE;
+	int dy = (int)pos.y - y * (int)BOX_SIZE; // チップの中の座標
 	return dy + 1;
 }
 
@@ -172,31 +159,30 @@ int Stage::CheckUp(VECTOR2 pos)
 		return 0;
 	}
 	// チップにどれぐらいめり込んでいるかを返す
-	int y = (int)pos.y / (int)BOX_HEIGHT;
-	int dy = (int)pos.y - y * (int)BOX_HEIGHT; // チップの中の座標
-	return (int)BOX_HEIGHT - dy;
+	int y = (int)pos.y / (int)BOX_SIZE;
+	int dy = (int)pos.y - y * (int)BOX_SIZE; // チップの中の座標
+	return (int)BOX_SIZE - dy;
 }
 
 
 void Stage::SetStartVertex(VECTOR2 pos)
 {
-	int x = pos.x / BOX_WIDTH;
-	int y = pos.y / BOX_HEIGHT;
+	int x = pos.x / BOX_SIZE;
+	int y = pos.y / BOX_SIZE;
 	start_ = { (float)x, (float)y };
 }
 
 void Stage::CreateGoPos(float x, float y)
 {
 	goPos_ = { x, y };
-	int mapX = (int)x / (int)BOX_WIDTH;
-	int mapY = (int)y / (int)BOX_HEIGHT;
-	//map_[mapY][mapX] = 3;
+	int mapX = (int)x / (int)BOX_SIZE;
+	int mapY = (int)y / (int)BOX_SIZE;
 }
 
 std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
 {
-	int x = pos.x / BOX_WIDTH;
-	int y = pos.y / BOX_HEIGHT;
+	int x = pos.x / BOX_SIZE;
+	int y = pos.y / BOX_SIZE;
 
 	for (int i = 0; i < vertexList_.size(); i++)
 	{
@@ -212,19 +198,17 @@ std::vector<vertex> Stage::GetShortestWay(VECTOR2 pos)
 					checkNum -= 1;
 				}
 
-				//SetWay(vertexList_[i].posList);
 				return vertexList_[i].posList;
 			}
 		}
 	}
 }
 
-
 bool Stage::IsWall(VECTOR2 pos)
 {
 	// チップの場所を特定する
-	int x = (int)pos.x / (int)BOX_WIDTH;
-	int y = (int)pos.y / (int)BOX_HEIGHT;
+	int x = (int)pos.x / (int)BOX_SIZE;
+	int y = (int)pos.y / (int)BOX_SIZE;
 	if (y < 0 || y >= map_.size()) {
 		return false;
 	}
@@ -233,9 +217,8 @@ bool Stage::IsWall(VECTOR2 pos)
 	}
 	// チップの番号を見て、壁かどうか確定する
 	switch (map_[y][x]) {
-	case 0:
-	case 2:
-	case 3:
+	case MAP_NUM::EMPTY:
+	case MAP_NUM::BRANCH:
 		return false;
 	}
 	return true;
@@ -254,7 +237,7 @@ void Stage::SetVertexList()
 			{
 				if (CheckVertex(x, y) == true) // 一方通行じゃない→分岐地点
 				{
-					map_[y][x] = 2;
+					map_[y][x] = MAP_NUM::BRANCH;
 					vertex v = { VECTOR2{(float)x, (float)y}, 1000, vertexList_.size(), false, std::vector<vertex>()};
 					vertexList_.push_back(v);
 				}
@@ -271,9 +254,9 @@ void Stage::SetVertexList()
 
 			int distance = 1;
 			// 距離を求める式
-			if (map_[(int)check.y][(int)check.x] != 1) // 壁じゃないなら
+			if (map_[(int)check.y][(int)check.x] != MAP_NUM::WALL) // 壁じゃないなら
 			{
-				while (map_[(int)check.y][(int)check.x] != 2) // 頂点に到達していない場合くり返す
+				while (map_[(int)check.y][(int)check.x] != MAP_NUM::BRANCH) // 頂点に到達していない場合くり返す
 				{
 					check = check + dir_[direction];
 					distance += 1;
@@ -308,7 +291,7 @@ bool Stage::CheckVertex(int mapX, int mapY)
 	{
 		int x = mapX + (int)dir_[i].x;
 		int y = mapY + (int)dir_[i].y;
-		if (map_[y][x] == 0 || map_[y][x] == 2)
+		if (map_[y][x] == MAP_NUM::EMPTY || map_[y][x] == MAP_NUM::BRANCH)
 		{
 			checkDir[i] = true;
 			counter += 1;
@@ -319,7 +302,7 @@ bool Stage::CheckVertex(int mapX, int mapY)
 		}
 	}
 
-	if (counter > 2)
+	if (counter > MAP_NUM::BRANCH)
 	{
 		ret = true;
 	}
@@ -375,7 +358,7 @@ int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
 			}
 		}
 	}
-	return 1000;
+	return MAX_DISTANCE;
 }
 
 int Stage::GetCost(vertex start, vertex end)
@@ -393,24 +376,7 @@ int Stage::GetCost(vertex start, vertex end)
 		}
 	}
 
-	return 1000;
-}
-
-void Stage::SetWay(std::vector<vertex> vertexList)
-{
-	for (int i = 0; i < map_.size(); i++)
-	{
-		for (int j = 0; j < map_[i].size(); j++)
-		{
-			for (int k = 0; k < vertexList.size(); k++)
-			{
-				if (i == (int)vertexList[k].position.x && j == (int)vertexList[k].position.y)
-				{
-					map_[j][i] = 3;
-				}
-			}
-		}
-	}
+	return MAX_DISTANCE;
 }
 
 void Stage::SetShortestWay(vertex start)
@@ -443,9 +409,7 @@ void Stage::SetShortestWay(vertex start)
 					}
 				}
 			}
-		}/*
-		DeleteWay(start, start.next[i]);
-		DeleteWay(start.next[i], start);*/
+		}
 	}
 
 	// 現時点で最も近い場所を探す
@@ -465,13 +429,6 @@ void Stage::SetShortestWay(vertex start)
 					std::swap(sortMinDistance[j], sortMinDistance[j + 1]);
 				}
 			}
-			//for (int j = checkVertexList_.size() - 2; j >= 0; j--)
-			//{
-			//	if (checkVertexList_[j].distance > checkVertexList_[j + 1].distance)
-			//	{
-			//		std::swap(checkVertexList_[j].distance, checkVertexList_[j + 1].distance);
-			//	}
-			//}
 		}
 
 		bool isAdd = true;
@@ -486,40 +443,6 @@ void Stage::SetShortestWay(vertex start)
 					std::swap(checkVertexList_[j].distance, checkVertexList_[j + 1].distance);
 				}
 			}
-			//for (int j = 0; j < checkVertexList_.size(); j++)
-			//{
-			//	if (checkVertexList_[j].position.x == sortMinDistance[i].position.x && checkVertexList_[j].position.y == sortMinDistance[i].position.y)
-			//	{
-			//		isAdd = false;
-			//	}
-			//	else
-			//	{
-			//		isAdd = true;
-			//	}
-			//}
-			//if (isAdd == true)
-			//{
-			//	checkVertexList_.push_back(sortMinDistance[i]);
-			//}
 		}
 	}
 }
-
-void Stage::DeleteWay(vertex start, vertex end)
-{
-	int deleteNum = -1;
-	for (int i = 0; i < copyWayList_.size(); i++)
-	{
-		if (copyWayList_[i].startPos.x == start.position.x && copyWayList_[i].startPos.y == start.position.y)
-		{
-			if (copyWayList_[i].endPos.x == end.position.x && copyWayList_[i].endPos.y == end.position.y)
-			{
-				deleteNum = i;
-				break;
-			}
-		}
-	}
-
-	copyWayList_.erase(copyWayList_.begin() + deleteNum);
-}
-
