@@ -26,7 +26,8 @@ Stage::Stage()
 	}
 	delete csv;
 	
-	start_ = { -1, -1 };
+	isSetStartPos_ = false;
+	startPos_ = { -1, -1 };
 	SetVertexList();
 }
 
@@ -36,7 +37,7 @@ Stage::~Stage()
 
 void Stage::Update()
 {
-	if (CheckHitKey(KEY_INPUT_C))
+	if (isSetStartPos_ == true)
 	{
 		copyWayList_.resize(wayList_.size());
 		copyWayList_.assign(wayList_.begin(), wayList_.end());
@@ -55,6 +56,7 @@ void Stage::Update()
 			checkVertexList_.erase(checkVertexList_.begin());
 		}
 
+		isSetStartPos_ = false;
 	}
 }
 
@@ -165,11 +167,26 @@ int Stage::CheckUp(VECTOR2 pos)
 }
 
 
+bool Stage::IsVertexPosition(VECTOR2 pos)
+{
+	int x = pos.x / BOX_SIZE;
+	int y = pos.y / BOX_SIZE;
+	for (int i = 0; i < vertexList_.size(); i++)
+	{
+		if (vertexList_[i].position.x == x && vertexList_[i].position.y == y)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void Stage::SetStartVertex(VECTOR2 pos)
 {
 	int x = pos.x / BOX_SIZE;
 	int y = pos.y / BOX_SIZE;
-	start_ = { (float)x, (float)y };
+	startPos_ = { (float)x, (float)y };
+	isSetStartPos_ = true;
 }
 
 void Stage::CreateGoPos(float x, float y)
@@ -223,8 +240,6 @@ bool Stage::IsWall(VECTOR2 pos)
 	}
 	return true;
 }
-
-
 
 void Stage::SetVertexList()
 {
@@ -335,7 +350,7 @@ vertex Stage::FindStartVertex()
 
 	for (int i = 0; i < vertexList_.size(); i++)
 	{
-		if (start_.x == (int)vertexList_[i].position.x && start_.y == (int)vertexList_[i].position.y)
+		if (startPos_.x == (int)vertexList_[i].position.x && startPos_.y == (int)vertexList_[i].position.y)
 		{
 			vertexList_[i].distance = 0;
 			vertexList_[i].isDicision = true;

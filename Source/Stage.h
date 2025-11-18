@@ -36,6 +36,9 @@ public:
 	int CheckUp(VECTOR2 pos);
 
 	VECTOR2 GetGoPos() { return goPos_; }
+	VECTOR2 GetStartPos() { return startPos_; }
+	bool IsVertexPosition(VECTOR2 pos);
+	bool GetIsSetStartPos() { return isSetStartPos_; }
 	void SetStartVertex(VECTOR2 pos);
 	void CreateGoPos(float x, float y);
 
@@ -63,6 +66,7 @@ private:
 	std::vector<std::vector<int>> map_;
 
 	// 経路探索の初期情報関連
+	bool isSetStartPos_;
 	void SetVertexList();
 	bool CheckVertex(int mapX, int mapY);
 	vertex FindStartVertex();
@@ -70,12 +74,12 @@ private:
 	int GetCost(vertex start, vertex end);
 
 	VECTOR2 goPos_;
-	VECTOR2 start_;
+	VECTOR2 startPos_;
 	std::vector<vertex> vertexList_;
 	std::vector<vertex> checkVertexList_;
 	std::vector<way> wayList_;
 	std::vector<way> copyWayList_;
-
+	
 	// 経路探索
 	void SetShortestWay(vertex start);
 	int cost_; // スタートからの距離

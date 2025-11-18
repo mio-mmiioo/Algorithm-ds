@@ -7,7 +7,7 @@ Enemy::Enemy()
 	hImage_ = LoadGraph("data/chara.png");
 	position_ = VECTOR2((float)(BOX_SIZE + BOX_SIZE / 2), (float)(BOX_SIZE + BOX_SIZE / 2));
 	isArrive_ = false;
-
+	isNextSetWay_ = false;
 	stage_ = FindGameObject<Stage>();
 }
 
@@ -24,9 +24,22 @@ void Enemy::Update()
 	if (Input::IsKeyDown(KEY_INPUT_J))
 	{
 		isArrive_ = false;
-		way_.resize(stage_->GetShortestWay(position_).size());
-		way_ = stage_->GetShortestWay(position_);
 		endPos_ = way_[0].position * (float)BOX_SIZE;
+	}
+	
+	if (isNextSetWay_ == true && stage_->IsVertexPosition(position_) == true)
+	{
+		isNextSetWay_ = false;
+		if (!(((int)(stage_->GetStartPos().x) == (int)(position_.x / BOX_SIZE)) && ((int)(stage_->GetStartPos().y) == (int)(position_.y / BOX_SIZE))))
+		{
+			way_.resize(stage_->GetShortestWay(position_).size());
+			way_ = stage_->GetShortestWay(position_);
+		}
+	}
+
+	if (stage_->GetIsSetStartPos() == true)
+	{
+		isNextSetWay_ = true;
 	}
 
 	if (isArrive_ == true)
@@ -101,8 +114,7 @@ void Enemy::Draw()
 					(int)way_[i + 1].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i + 1].position.y * BOX_SIZE + BOX_SIZE / 2,
 					GetColor(0, 0, 255), TRUE);
 			}
-		}
-		
+		}		
 	}
 }
 

@@ -19,4 +19,5 @@ private:
 	VECTOR2 move;
 
 	bool isArrive_;
+	bool isNextSetWay_;
 };
