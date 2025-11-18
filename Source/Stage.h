@@ -3,7 +3,7 @@
 #include <vector>
 
 namespace {
-	int BOX_SIZE = 30;
+	int BOX_SIZE = 50;
 	int MAX_DISTANCE = 1000;
 }
 
@@ -78,7 +78,6 @@ private:
 	std::vector<vertex> vertexList_;
 	std::vector<vertex> checkVertexList_;
 	std::vector<way> wayList_;
-	std::vector<way> copyWayList_;
 	
 	// åoòHíTçı
 	void SetShortestWay(vertex start);

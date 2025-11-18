@@ -39,8 +39,6 @@ void Stage::Update()
 {
 	if (isSetStartPos_ == true)
 	{
-		copyWayList_.resize(wayList_.size());
-		copyWayList_.assign(wayList_.begin(), wayList_.end());
 		for (int i = 0; i < vertexList_.size(); i++)
 		{
 			vertexList_[i].distance = MAX_DISTANCE;
@@ -363,13 +361,13 @@ vertex Stage::FindStartVertex()
 
 int Stage::GetCost(VECTOR2 startPos, VECTOR2 endPos)
 {
-	for (int i = 0; i < copyWayList_.size(); i++)
+	for (int i = 0; i < wayList_.size(); i++)
 	{
-		if (copyWayList_[i].startPos.x == startPos.x && copyWayList_[i].startPos.y == startPos.y)
+		if (wayList_[i].startPos.x == startPos.x && wayList_[i].startPos.y == startPos.y)
 		{
-			if (copyWayList_[i].endPos.x == endPos.x && copyWayList_[i].endPos.y == endPos.y)
+			if (wayList_[i].endPos.x == endPos.x && wayList_[i].endPos.y == endPos.y)
 			{
-				return copyWayList_[i].cost;
+				return wayList_[i].cost;
 			}
 		}
 	}
@@ -380,13 +378,13 @@ int Stage::GetCost(vertex start, vertex end)
 {
 	way ret;
 	
-	for (int i = 0; i < copyWayList_.size(); i++)
+	for (int i = 0; i < wayList_.size(); i++)
 	{
-		if (copyWayList_[i].startPos.x == start.position.x && copyWayList_[i].startPos.y == start.position.y)
+		if (wayList_[i].startPos.x == start.position.x && wayList_[i].startPos.y == start.position.y)
 		{
-			if (copyWayList_[i].endPos.x == end.position.x && copyWayList_[i].endPos.y == end.position.y)
+			if (wayList_[i].endPos.x == end.position.x && wayList_[i].endPos.y == end.position.y)
 			{
-				return copyWayList_[i].cost;
+				return wayList_[i].cost;
 			}
 		}
 	}
