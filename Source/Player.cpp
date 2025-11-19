@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "Stage.h"
 
-static const float Speed = 1.5f;
+static const float Speed = 3.0f;
 static const int playerSizeR = 5;
 
 Player::Player()

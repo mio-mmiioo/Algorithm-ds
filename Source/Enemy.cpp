@@ -106,13 +106,13 @@ void Enemy::Draw()
 			{
 				DrawLine(position_.x, position_.y,
 					(int)way_[i].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i].position.y * BOX_SIZE + BOX_SIZE / 2,
-					GetColor(0, 0, 255), TRUE);
+					GetColor(0, 0, 255), 5);
 			}
 			else if (i < way_.size() - 1)
 			{
 				DrawLine((int)way_[i].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i].position.y * BOX_SIZE + BOX_SIZE / 2,
 					(int)way_[i + 1].position.x * BOX_SIZE + BOX_SIZE / 2, (int)way_[i + 1].position.y * BOX_SIZE + BOX_SIZE / 2,
-					GetColor(0, 0, 255), TRUE);
+					GetColor(0, 0, 255), 5);
 			}
 		}		
 	}
